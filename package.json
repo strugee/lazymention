@@ -1,0 +1,26 @@
+{
+  "name": "lazymention",
+  "version": "1.0.0",
+  "description": "Support WebSub and Webmention on a static site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strugee/lazymention.git"
+  },
+  "keywords": [
+    "webmention",
+    "websub",
+    "indieweb",
+    "staticsite",
+    "daemon"
+  ],
+  "author": "Alex Jordan <alex@strugee.net>",
+  "license": "AGPL-3.0+",
+  "bugs": {
+    "url": "https://github.com/strugee/lazymention/issues"
+  },
+  "homepage": "https://github.com/strugee/lazymention#readme"
+}
