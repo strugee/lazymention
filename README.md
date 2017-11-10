@@ -17,3 +17,5 @@ AJ Jordan <alex@strugee.net>
 ## License
 
 AGPL 3.0 or later
+
+ [IndieWeb]: https://indieweb.org/
