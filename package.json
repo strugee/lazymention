@@ -4,7 +4,7 @@
   "description": "Support WebSub and Webmention on a static site",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "perjury test/*-test.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
   "dependencies": {
     "compression": "^1.7.1",
     "express": "^4.16.2",
+    "lodash": "^4.17.4",
     "perjury": "^1.1.0"
   }
 }

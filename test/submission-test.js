@@ -24,22 +24,36 @@ License along with lazymention. If not, see
 
 var vows = require('perjury'),
     assert = vows.assert,
-    express = require('express');
+    httputil = require('./lib/http');
 
-vows.describe('app module test').addBatch({
-	'When we get the app module': {
+vows.describe('basic submission test').addBatch({
+	'When we set up the app': {
 		topic: function() {
-			return require('../lib/app');
+			var app = require('../lib/app').app,
+			    cb = this.callback;
+
+			var server = app.listen(5320, 'localhost', function(err) {
+				cb(err, server);
+			});
+		},
+		teardown: function(app) {
+			if (app && app.close) {
+				app.close(this.callback);
+			}
 		},
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports an Express application': function(err, app) {
-			assert.isFunction(app.app);
-		},
-		'it exports an Express Router': function(err, app) {
-			assert.isFunction(app.router);
-			assert.isTrue(express.Router.isPrototypeOf(app.router));
+		'and we HTTP POST to /jobs/submit': {
+			topic: function(app) {
+				httputil.post('/jobs/submit', '', this.callback);
+			},
+			'it works': function(err) {
+				assert.ifError(err);
+			},
+			'it returns 200 OK': function(err, res) {
+				assert.equal(res.statusCode, 200);
+			}
 		}
 	}
 }).export(module);

@@ -22,24 +22,37 @@ License along with lazymention. If not, see
 
 'use strict';
 
-var vows = require('perjury'),
-    assert = vows.assert,
-    express = require('express');
+// TODO test this file
 
-vows.describe('app module test').addBatch({
-	'When we get the app module': {
-		topic: function() {
-			return require('../lib/app');
-		},
-		'it works': function(err) {
-			assert.ifError(err);
-		},
-		'it exports an Express application': function(err, app) {
-			assert.isFunction(app.app);
-		},
-		'it exports an Express Router': function(err, app) {
-			assert.isFunction(app.router);
-			assert.isTrue(express.Router.isPrototypeOf(app.router));
-		}
+var http = require('http');
+
+function httpPost(path, data, headers, callback) {
+	if (!callback) {
+		callback = headers;
+		headers = {};
 	}
-}).export(module);
+	var opts = {
+		port: 5320,
+		host: 'localhost',
+		method: 'POST',
+		path: path,
+		headers: headers
+	};
+
+	var req = http.request(opts, function(res) {
+		callback(undefined, res);
+	});
+
+	req.on('error', function(err) {
+		callback(err);
+	});
+
+	req.end(data);
+};
+
+function httpPostJSON(path, data, callback) {
+	httpPost(path, JSON.stringify(data), {'Content-Type': 'application/json'}, callback);
+};
+
+module.exports.post = httpPost;
+module.exports.postJSON = httpPostJSON;
