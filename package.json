@@ -17,7 +17,7 @@
     "staticsite",
     "daemon"
   ],
-  "author": "Alex Jordan <alex@strugee.net>",
+  "author": "AJ Jordan <alex@strugee.net>",
   "license": "AGPL-3.0+",
   "bugs": {
     "url": "https://github.com/strugee/lazymention/issues"
