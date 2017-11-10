@@ -22,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/strugee/lazymention/issues"
   },
-  "homepage": "https://github.com/strugee/lazymention#readme"
+  "homepage": "https://github.com/strugee/lazymention#readme",
+  "dependencies": {
+    "compression": "^1.7.1",
+    "express": "^4.16.2",
+    "perjury": "^1.1.0"
+  }
 }
