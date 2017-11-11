@@ -25,7 +25,8 @@ License along with lazymention. If not, see
 'use strict';
 
 var app = require('../lib/app.js').app,
-    persistence = require('../lib/persistence');
+    persistence = require('../lib/persistence'),
+    log = require('../lib/log');
 
 var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
                    'License AGPLv3+: GNU Affero GPL version 3 or later <https://gnu.org/licenses/agpl-3.0.html>.',
@@ -51,5 +52,7 @@ persistence.configure(argv.storage);
 var server = app.listen(argv.port, argv.address, function() {
 	var host = server.address().address;
 	var port = server.address().port;
-	console.log('Server listening at http://%s:%s/', host, port);
+	log.info('Server listening at http://' + host + ':' + port + '/');
 });
+
+server.on('error', log.error.bind(log));

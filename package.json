@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/strugee/lazymention#readme",
   "dependencies": {
+    "bunyan": "^1.8.12",
     "cheerio": "^1.0.0-rc.2",
     "compression": "^1.7.1",
     "concat-stream": "^1.6.0",
