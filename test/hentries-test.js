@@ -39,6 +39,7 @@ vows.describe('HTTP retrieval module').addBatch({
 		'it exports a function': function(err, handleNode) {
 			assert.isFunction(handleNode);
 		},
+		// XXX make more sample files
 		'and we pass it an h-feed with some h-entries': {
 			topic: function(handleNode) {
 				var cb = this.callback;
