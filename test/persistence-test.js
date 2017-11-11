@@ -107,7 +107,7 @@ vows.describe('persistence module').addBatch({
 				},
 				'and we get a nonexistant key': {
 					topic: function(db) {
-						db.get('meaning_of_life', this.callback);
+						db.get('lolnope', this.callback);
 					},
 					'it worked': function(err) {
 						assert.ifError(err);
