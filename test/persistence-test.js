@@ -89,7 +89,7 @@ vows.describe('persistence module').addBatch({
 				'and we set a key with a slash': {
 					topic: function(db) {
 						var cb = this.callback;
-						db.set('lazymention/subkey', 42, function(err) {
+						db.set('lazymention/subkey', {foo: 'bar'}, function(err) {
 							cb(err, db);
 						});
 					},
@@ -99,10 +99,11 @@ vows.describe('persistence module').addBatch({
 					'and we get the key': {
 						topic: function(db) {
 							debugger;
-							db.get('meaning_of_life', this.callback);
+							db.get('lazymention/subkey', this.callback);
 						},
-						'it worked': function(err) {
+						'it worked': function(err, obj) {
 							assert.ifError(err);
+							assert.equal(obj.foo, 'bar');
 						}
 					}
 				},
