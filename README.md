@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/strugee/lazymention.svg?branch=master)](https://travis-ci.org/strugee/lazymention)
 [![Coverage Status](https://coveralls.io/repos/github/strugee/lazymention/badge.svg?branch=master)](https://coveralls.io/github/strugee/lazymention?branch=master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/strugee/lazymention.svg)](https://greenkeeper.io/)
 
 tl;dr: Support WebSub and Webmention on a static site
 
