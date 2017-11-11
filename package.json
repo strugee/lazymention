@@ -29,9 +29,11 @@
     "express": "^4.16.2",
     "lodash": "^4.17.4",
     "microformat-node": "^2.0.1",
+    "write-file-atomic": "^2.3.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
+    "mock-fs": "^4.4.2",
     "perjury": "^1.1.0"
   }
 }
