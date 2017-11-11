@@ -86,6 +86,26 @@ vows.describe('persistence module').addBatch({
 						}
 					}
 				},
+				'and we set a key with a slash': {
+					topic: function(db) {
+						var cb = this.callback;
+						db.set('lazymention/subkey', 42, function(err) {
+							cb(err, db);
+						});
+					},
+					'it works': function(err) {
+						assert.ifError(err);
+					},
+					'and we get the key': {
+						topic: function(db) {
+							debugger;
+							db.get('meaning_of_life', this.callback);
+						},
+						'it worked': function(err) {
+							assert.ifError(err);
+						}
+					}
+				},
 				'and we get a nonexistant key': {
 					topic: function(db) {
 						db.get('meaning_of_life', this.callback);
