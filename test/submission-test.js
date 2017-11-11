@@ -51,8 +51,8 @@ vows.describe('basic submission test').addBatch({
 			'it works': function(err) {
 				assert.ifError(err);
 			},
-			'it returns 200 OK': function(err, res) {
-				assert.equal(res.statusCode, 200);
+			'it returns 202 Accepted': function(err, res) {
+				assert.equal(res.statusCode, 202);
 			}
 		}
 	}
