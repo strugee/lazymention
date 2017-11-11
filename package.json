@@ -4,7 +4,7 @@
   "description": "Support WebSub and Webmention on a static site",
   "main": "index.js",
   "scripts": {
-    "test": "perjury test/*-test.js"
+    "test": "nyc -r lcov -r text perjury test/*-test.js"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,9 @@
     "yargs": "^10.0.3"
   },
   "devDependencies": {
+    "coveralls": "^3.0.0",
     "mock-fs": "^4.4.2",
+    "nyc": "^11.3.0",
     "perjury": "^1.1.0"
   }
 }
