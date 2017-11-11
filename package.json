@@ -25,8 +25,10 @@
   "homepage": "https://github.com/strugee/lazymention#readme",
   "dependencies": {
     "compression": "^1.7.1",
+    "concat-stream": "^1.6.0",
     "express": "^4.16.2",
     "lodash": "^4.17.4",
+    "microformat-node": "^2.0.1",
     "perjury": "^1.1.0",
     "yargs": "^10.0.3"
   }
