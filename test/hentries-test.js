@@ -87,10 +87,10 @@ vows.describe('HTTP retrieval module').addBatch({
 				},
 				'it has the structure we expect': function(err, arr) {
 					assert.isArray(arr);
-					arr.forEach(function(el) {
-						assert.isObject(el);
-						// Check if an mf2 property is there
-						assert.isObject(el.properties.content);
+					arr.forEach(function(obj) {
+						assert.isObject(obj);
+						assert.equal(obj.resolvedUrl.slice(0, -1), 'http://localhost:47298/entry-');
+						assert.isString(obj.html);
 					});
 				},
 				'it has the right length': function(err, arr) {
