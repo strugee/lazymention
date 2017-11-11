@@ -10,6 +10,19 @@ Currently a work in progress.
 
     $ npm install -g lazymention
 
+## Limitations
+
+lazymention makes some maintainability tradeoffs that may result in denial-of-service problems if you allow input from sites you don't trust. Specifically:
+
+* lazymention buffers all HTML pages in memory before parsing microformats2. In the future it may also retrieve multiple HTML pages per job. This may lead to high memory usage.
+* lazymention's handling of microformats2 structures within pages is rather brittle. For example, if you mark an element as both an `h-entry` _and_ an `h-feed`, lazymention will probably crash. I will take PRs to fix these problems, especially those caused by nonmalicious markup, but in the meantime your process will be very dead.
+
+Please be aware of these constraints before running lazymention in production.
+
+In terms of correctness, it also will not retrieve the canonical URL for a given `h-entry`, and simply use whatever markup it first encounters. If you don't put the same markup on individual post pages as you do on feeds, you'll probably have a Bad Time™. Oh also, it has no idea how to recurse into subpages of indexes.
+
+In the real world, I expect that these will not actually be real problems.
+
 ## Author
 
 AJ Jordan <alex@strugee.net>
