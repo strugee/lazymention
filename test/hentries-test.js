@@ -25,61 +25,77 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     mf2 = require('microformat-node'),
+    express = require('express'),
     fs = require('fs'),
     path = require('path');
 
 vows.describe('HTTP retrieval module').addBatch({
-	'When we require the module': {
+	'When we set up a server to serve posts': {
 		topic: function() {
-			return require('../lib/hentries');
+			var app = express();
+
+			app.use(express.static(path.join(__dirname, 'data'), {
+				extensions: ['html']
+			}));
+
+			app.listen(47298, this.callback);
 		},
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports a function': function(err, handleNode) {
-			assert.isFunction(handleNode);
-		},
-		// XXX make more sample files
-		'and we pass it an h-feed with some h-entries': {
-			topic: function(handleNode) {
-				var cb = this.callback;
 
-				fs.readFile(path.join(__dirname, 'data/h-feed-with-h-entries.html'), function(err, data) {
-					if (err) {
-						cb(err);
-						return;
-					}
+		'and we require the module': {
+			topic: function() {
+				return require('../lib/hentries');
+			},
+			'it works': function(err) {
+				assert.ifError(err);
+			},
+			'it exports a function': function(err, handleNode) {
+				assert.isFunction(handleNode);
+			},
+			// XXX make more sample files
+			'and we pass it an h-feed with some h-entries': {
+				topic: function(handleNode) {
+					var cb = this.callback;
 
-					mf2.get({html: data.toString()}, function(_err, _data) {
+					fs.readFile(path.join(__dirname, 'data/h-feed-with-h-entries.html'), function(err, data) {
 						if (err) {
 							cb(err);
 							return;
 						}
 
-						handleNode(_data.items[0], function(err, arr) {
+						mf2.get({html: data.toString()}, function(_err, _data) {
 							if (err) {
 								cb(err);
 								return;
 							}
 
-							cb(undefined, arr);
+							handleNode('http://localhost:47298', _data.items[0], function(err, arr) {
+								if (err) {
+									cb(err);
+									return;
+								}
+
+								cb(undefined, arr);
+							});
 						});
 					});
-				});
-			},
-			'it works': function(err, arr) {
-				assert.ifError(err);
-			},
-			'it has the structure we expect': function(err, arr) {
-				assert.isArray(arr);
-				arr.forEach(function(el) {
-					assert.isObject(el);
-					// Check if an mf2 property is there
-					assert.isObject(el.properties.content);
-				});
-			},
-			'it has the right length': function(err, arr) {
-				assert.equal(arr.length, 2);
+				},
+				'it works': function(err, arr) {
+					assert.ifError(err);
+				},
+				'it has the structure we expect': function(err, arr) {
+					assert.isArray(arr);
+					arr.forEach(function(el) {
+						assert.isObject(el);
+						// Check if an mf2 property is there
+						assert.isObject(el.properties.content);
+					});
+				},
+				'it has the right length': function(err, arr) {
+					assert.equal(arr.length, 2);
+				}
 			}
 		}
 	}
