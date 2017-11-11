@@ -29,7 +29,9 @@
     "express": "^4.16.2",
     "lodash": "^4.17.4",
     "microformat-node": "^2.0.1",
-    "perjury": "^1.1.0",
     "yargs": "^10.0.3"
+  },
+  "devDependencies": {
+    "perjury": "^1.1.0"
   }
 }
