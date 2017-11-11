@@ -74,7 +74,6 @@ vows.describe('persistence module').addBatch({
 					},
 					'and we get the key': {
 						topic: function(db) {
-							debugger;
 							db.get('meaning_of_life', this.callback);
 						},
 						'it worked': function(err) {
@@ -98,7 +97,6 @@ vows.describe('persistence module').addBatch({
 					},
 					'and we get the key': {
 						topic: function(db) {
-							debugger;
 							db.get('lazymention/subkey', this.callback);
 						},
 						'it worked': function(err, obj) {
