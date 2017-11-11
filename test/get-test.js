@@ -130,7 +130,8 @@ vows.describe('HTTP retrieval module').addBatch({
 					assert.ifError(err);
 				},
 				'we sent the right User-Agent': function(err, data) {
-					assert.equal(data, 'node.js/8.5.0 lazymention/1.0.0');
+					assert.isTrue(data.includes('node.js/'));
+					assert.isTrue(data.includes('lazymention/1.0.0'));
 				}
 			}
 		}
