@@ -46,7 +46,7 @@ vows.describe('basic submission test').addBatch({
 		},
 		'and we HTTP POST to /jobs/submit': {
 			topic: function(app) {
-				httputil.post('/jobs/submit', '', this.callback);
+				httputil.postJSON('/jobs/submit', {url: 'https://strugee.net/blog/'}, this.callback);
 			},
 			'it works': function(err) {
 				assert.ifError(err);
