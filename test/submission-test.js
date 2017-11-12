@@ -24,35 +24,51 @@ License along with lazymention. If not, see
 
 var vows = require('perjury'),
     assert = vows.assert,
+    express = require('express'),
+    path = require('path'),
     httputil = require('./lib/http');
 
 vows.describe('basic submission test').addBatch({
-	'When we set up the app': {
+	'When we set up a server to serve posts': {
 		topic: function() {
-			var app = require('../lib/app').app,
-			    cb = this.callback;
+			var app = express();
 
-			var server = app.listen(5320, 'localhost', function(err) {
-				cb(err, server);
-			});
-		},
-		teardown: function(app) {
-			if (app && app.close) {
-				app.close(this.callback);
-			}
+			app.use(express.static(path.join(__dirname, 'data'), {
+				extensions: ['html']
+			}));
+
+			app.listen(17140, this.callback);
 		},
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'and we HTTP POST to /jobs/submit': {
-			topic: function(app) {
-				httputil.postJSON('/jobs/submit', {url: 'https://strugee.net/blog/'}, this.callback);
+		'and we set up the app': {
+			topic: function() {
+				var app = require('../lib/app').app,
+				cb = this.callback;
+
+				var server = app.listen(5320, 'localhost', function(err) {
+					cb(err, server);
+				});
+			},
+			teardown: function(app) {
+				if (app && app.close) {
+					app.close(this.callback);
+				}
 			},
 			'it works': function(err) {
 				assert.ifError(err);
 			},
-			'it returns 202 Accepted': function(err, res) {
-				assert.equal(res.statusCode, 202);
+			'and we HTTP POST to /jobs/submit': {
+				topic: function(app) {
+					httputil.postJSON('/jobs/submit', {url: 'http://localhost:17140/h-feed-with-h-entries.html'}, this.callback);
+				},
+				'it works': function(err) {
+					assert.ifError(err);
+				},
+				'it returns 202 Accepted': function(err, res) {
+					assert.equal(res.statusCode, 202);
+				}
 			}
 		}
 	}
