@@ -32,6 +32,7 @@
     "lodash": "^4.17.4",
     "microformat-node": "^2.0.1",
     "slash-escape": "^1.0.0",
+    "uuid": "^3.1.0",
     "webmention-client": "github:strugee/node-webmention-client#patched-lookup",
     "write-file-atomic": "^2.3.0",
     "yargs": "^10.0.3"
