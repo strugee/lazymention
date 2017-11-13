@@ -88,7 +88,7 @@ vows.describe('submission test').addBatch({
 					                  // we don't have proper end-to-end
 					                  // Webmention tests, but that's the way
 					                  // things are at the moment.
-					                  setTimeout.bind(undefined, this.callback, 1000));
+					                  setTimeout.bind(undefined, this.callback, 500));
 				},
 				'it works': function(err) {
 					assert.ifError(err);
