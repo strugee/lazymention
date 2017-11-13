@@ -74,7 +74,6 @@ vows.describe('Webmention module').addBatch({
 					           });
 				},
 				'it works': function(err) {
-					console.log(err);
 					assert.ifError(err);
 				},
 				'the spy was called': function(err, fns) {
