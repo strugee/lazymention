@@ -25,7 +25,8 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     _ = require('lodash'),
-    mockFs = require('mock-fs');
+    persistenceutil = require('./lib/persistence'),
+    wrapFsMocks = persistenceutil.wrapFsMocks;
 
 vows.describe('persistence module').addBatch({
 	'When we require the module': {
@@ -40,20 +41,7 @@ vows.describe('persistence module').addBatch({
 			assert.isFunction(db.get);
 			assert.isFunction(db.set);
 		},
-		'and we mock out the `fs` module': {
-			topic: function(db) {
-				mockFs({
-					'/tmp': mockFs.directory()
-				});
-				return db;
-			},
-			teardown: function() {
-				mockFs.restore();
-				return true;
-			},
-			'it works': function(err) {
-				assert.ifError(err);
-			},
+		'and we mock out the `fs` module': wrapFsMocks(false, {
 			'and we configure the module with a path': {
 				topic: function(db) {
 					db.configure('/tmp');
@@ -118,6 +106,6 @@ vows.describe('persistence module').addBatch({
 					}
 				}
 			}
-		}
+		})
 	}
 }).export(module);

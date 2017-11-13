@@ -27,6 +27,8 @@ var vows = require('perjury'),
     mockFs = require('mock-fs'),
     proxyquire = require('proxyquire'),
     sinon = require('sinon'),
+    persistenceutil = require('./lib/persistence'),
+    wrapFsMocks = persistenceutil.wrapFsMocks,
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
 	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!'
@@ -58,21 +60,7 @@ vows.describe('Webmention module').addBatch({
 		'it exports a function': function(err, webmention) {
 			assert.isFunction(webmention[1]);
 		},
-		'and we set up persistence mocks': {
-			topic: function(webmention) {
-				require('../lib/persistence').configure('/tmp');
-				mockFs({
-					'/tmp': mockFs.directory()
-				});
-				return webmention;
-			},
-			teardown: function() {
-				mockFs.restore();
-				return true;
-			},
-			'it works': function(err) {
-				assert.ifError(err);
-			},
+		'and we set up persistence mocks': wrapFsMocks({
 			'and we call the module with a post': {
 				topic: function(fns) {
 					var webmention = fns[1],
@@ -86,6 +74,7 @@ vows.describe('Webmention module').addBatch({
 					           });
 				},
 				'it works': function(err) {
+					console.log(err);
 					assert.ifError(err);
 				},
 				'the spy was called': function(err, fns) {
@@ -167,6 +156,6 @@ vows.describe('Webmention module').addBatch({
 					}
 				}
 			}
-		}
+		})
 	}
 }).export(module);
