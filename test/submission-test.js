@@ -57,6 +57,8 @@ vows.describe('submission test').addBatch({
 				var app = require('../lib/app').app,
 				cb = this.callback;
 
+				require('../lib/persistence').configure('/tmp');
+
 				var server = app.listen(5320, 'localhost', function(err) {
 					cb(err, server);
 				});
