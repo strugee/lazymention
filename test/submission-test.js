@@ -28,16 +28,26 @@ var vows = require('perjury'),
     path = require('path'),
     httputil = require('./lib/http');
 
-vows.describe('basic submission test').addBatch({
+// XXX also assert on an OPTIONS request
+
+vows.describe('submission test').addBatch({
 	'When we set up a server to serve posts': {
 		topic: function() {
-			var app = express();
+			var app = express(),
+			    cb = this.callback;
 
 			app.use(express.static(path.join(__dirname, 'data'), {
 				extensions: ['html']
 			}));
 
-			app.listen(17140, this.callback);
+			var server = app.listen(17140, function(err) {
+				cb(err, server);
+			});
+		},
+		teardown: function(server) {
+			if (server && server.close) {
+				server.close(this.callback);
+			}
 		},
 		'it works': function(err) {
 			assert.ifError(err);
@@ -69,6 +79,42 @@ vows.describe('basic submission test').addBatch({
 				'it returns 202 Accepted': function(err, res) {
 					assert.equal(res.statusCode, 202);
 				}
+			},
+			'and we HTTP POST to /jobs/submit with invalid JSON': {
+				topic: function(app) {
+					httputil.post('/jobs/submit', '{lol syntax}', this.callback);
+				},
+				'it works': function(err) {
+					assert.ifError(err);
+				},
+				'it returns 400 Bad Request': function(err, res) {
+					assert.equal(res.statusCode, 400);
+				}
+
+			},
+			'and we HTTP POST to /jobs/submit with an empty body': {
+				topic: function(app) {
+					httputil.post('/jobs/submit', '', this.callback);
+				},
+				'it works': function(err) {
+					assert.ifError(err);
+				},
+				'it returns 400 Bad Request': function(err, res) {
+					assert.equal(res.statusCode, 400);
+				}
+
+			},
+			'and we HTTP POST to /jobs/submit without a URL parameter': {
+				topic: function(app) {
+					httputil.postJSON('/jobs/submit', {urlll: 'http://typos.com'}, this.callback);
+				},
+				'it works': function(err) {
+					assert.ifError(err);
+				},
+				'it returns 400 Bad Request': function(err, res) {
+					assert.equal(res.statusCode, 400);
+				}
+
 			}
 		}
 	}
