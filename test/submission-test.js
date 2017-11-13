@@ -71,7 +71,22 @@ vows.describe('submission test').addBatch({
 			},
 			'and we HTTP POST to /jobs/submit': {
 				topic: function(app) {
-					httputil.postJSON('/jobs/submit', {url: 'http://localhost:17140/h-feed-with-h-entries.html'}, this.callback);
+					httputil.postJSON('/jobs/submit',
+					                  {
+						                  url: 'http://localhost:17140/h-feed-with-h-entries.html'
+					                  },
+					                  // We set a timeout because otherwise the
+					                  // response handler returns 202 Accepted
+					                  // immediately, Perjury finishes the rest
+					                  // of the tests and exits, and the rest of
+					                  // the response handler doesn't have time
+					                  // to run.
+					                  //
+					                  // This is obviously a dirty hack because
+					                  // we don't have proper end-to-end
+					                  // Webmention tests, but that's the way
+					                  // things are at the moment.
+					                  setTimeout.bind(undefined, this.callback, 1000));
 				},
 				'it works': function(err) {
 					assert.ifError(err);
