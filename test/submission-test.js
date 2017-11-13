@@ -26,7 +26,9 @@ var vows = require('perjury'),
     assert = vows.assert,
     express = require('express'),
     path = require('path'),
-    httputil = require('./lib/http');
+    httputil = require('./lib/http'),
+    apputil = require('./lib/app'),
+    wrapAppSetup = apputil.wrapAppSetup;
 
 // XXX also assert on an OPTIONS request
 
@@ -52,25 +54,7 @@ vows.describe('submission test').addBatch({
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'and we set up the app': {
-			topic: function() {
-				var app = require('../lib/app').app,
-				cb = this.callback;
-
-				require('../lib/persistence').configure('/tmp');
-
-				var server = app.listen(5320, 'localhost', function(err) {
-					cb(err, server);
-				});
-			},
-			teardown: function(app) {
-				if (app && app.close) {
-					app.close(this.callback);
-				}
-			},
-			'it works': function(err) {
-				assert.ifError(err);
-			},
+		'and we set up the app': wrapAppSetup({
 			'and we HTTP POST to /jobs/submit': {
 				topic: function(app) {
 					httputil.postJSON('/jobs/submit',
@@ -131,8 +115,7 @@ vows.describe('submission test').addBatch({
 				'it returns 400 Bad Request': function(err, res) {
 					assert.equal(res.statusCode, 400);
 				}
-
 			}
-		}
+		})
 	}
 }).export(module);
