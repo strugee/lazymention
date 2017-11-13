@@ -6,4 +6,12 @@ node_js:
   - '7'
   - '8'
   - '9'
-after_script: ./node_modules/.bin/coveralls < coverage/lcov.info
+before_install:
+  - npm install -g npm@5
+  - npm install -g greenkeeper-lockfile@1
+before_script: greenkeeper-lockfile-update
+# See greenkeeperio/greenkeeper-lockfile#87 for why we pipe to /dev/null
+after_script: "./node_modules/.bin/coveralls < coverage/lcov.info && greenkeeper-lockfile-upload > /dev/null"
+env:
+  global:
+    secure: m+cKinrp0YC4XuG/QD7mnHR1DWWwV6gTSR2tkxJXbollN+qjSltopgysTyppKsmyZf+rYtUc+YFzdwLu/soXZogxBiKBjxGfHAhUM33sAkPt9K2sGOLQU4QW6ZCUHnVYAxhJRebvKaYUST+VUPyO8Le4v4j7Evvmy8DiL3W7CjYL4+nu3ZRSjUiQd3LFIbZ1lJP+ihVwV3kyCl/IRMeh8YADRKWyefqKLyzC3MC3OR53AohDP0+UXy5xyUV/USlIX06GcsjoGex9vK3xh0mKPxB/goiAlNxqvG+V5DLRTT2cdRe7y7b5iFYRoYbddVzvgsZFD60qPQiBdqShPw792i78Yh3qng7G6pkEik6sS8KMEzVk4yVZahNxVBcNEMw5mjPCLCDfwFtk4+3RnY4PTX4Ro3TQAKOildjG+/10GpmfktrcMo0vRat18WTRr0XbKS2vUdkoMrGuSTjvNHTxrAoh+chsFBlJLxc+Ba4GKfVKwMagvYwAE0n6XUiUQV47N1U71x5AqGaTDTBtFXVIMrwQyBOqazJEMce/mjqaatiwF8EAElJrMj9FM7mhhc7ACBuz9yduUqUk4cCBezfy5TdqC6epjYmW13UVK3eVSnMXP97QmqtynH54wAUlN29UqB3v8PSn+q5zesSYkMgQKRWFOQULirB56PW3jN9a1KE=
