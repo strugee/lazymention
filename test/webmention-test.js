@@ -44,7 +44,7 @@ vows.describe('Webmention module').addBatch({
 				cb();
 			    }),
 			    module = proxyquire('../lib/webmention', {
-				'webmention-client': spy
+				'send-webmention': spy
 			    });
 
 			clock = sinon.useFakeTimers(150 * 1000);
