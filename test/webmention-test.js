@@ -25,136 +25,179 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     mockFs = require('mock-fs'),
-    proxyquire = require('proxyquire'),
     sinon = require('sinon'),
+    http = require('http'),
+    concat = require('concat-stream'),
     persistenceutil = require('./lib/persistence'),
     wrapFsMocks = persistenceutil.wrapFsMocks,
     data = {
-	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
-	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!'
+	    singleLink: '<a href="http://localhost:18762/blag/new-puppy">So cute!</a>',
+	    multipleLinks: '<a href="http://localhost:18762/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!'
     };
 
-var clock;
+var clock, setServerCallback, webmention;
 
 vows.describe('Webmention module').addBatch({
-	'When we require the module with all our mocks': {
+	'When we set up a local server': {
 		topic: function() {
-			// XXX is this coupling too much to implementation?
-			var spy = sinon.spy(function(source, destination, cb) {
-				cb();
-			    }),
-			    module = proxyquire('../lib/webmention', {
-				'send-webmention': spy
-			    });
+			var cb = this.callback,
+			    reqs = [],
+			    serverCallback;
 
-			clock = sinon.useFakeTimers(150 * 1000);
+			setServerCallback = function(cb) {
+				serverCallback = function(err, data) {
+					if (err) console.error((new Error()).stack);
+					cb(undefined, data);
+				};
+			};
 
-			return [spy, module];
+			var server = http.createServer(function(req, res) {
+				res.statusCode = 202;
+				res.setHeader('Link', '</webmention>; rel="webmention"');
+
+				if (req.url === '/webmention') {
+					req.pipe(concat(function (buf) {
+						reqs.push(buf.toString());
+						res.end();
+						console.log('dfwa');
+						serverCallback(undefined, buf.toString());
+					})).on('error', serverCallback);
+				} else {
+					res.end();
+				}
+			});
+
+			server.listen(18762, function(err) {
+				cb(err, server, reqs);
+			});
 		},
-		teardown: function() {
-			return clock.restore();
+		teardown: function(server) {
+			if (server && server.close) {
+				server.close();
+			}
+
+			return true;
 		},
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports a function': function(err, webmention) {
-			assert.isFunction(webmention[1]);
-		},
-		'and we set up persistence mocks': wrapFsMocks({
-			'and we call the module with a post': {
-				topic: function(fns) {
-					var webmention = fns[1],
-					    cb = this.callback;
+		'and we require the module with all our mocks': {
+			topic: function() {
+				clock = sinon.useFakeTimers(150 * 1000);
 
-					webmention('http://example.com/socute',
-					           100,
-					           data.singleLink,
-					           function(err) {
-						           cb(err, fns);
-					           });
-				},
-				'it works': function(err) {
-					assert.ifError(err);
-				},
-				'the spy was called': function(err, fns) {
-					var spy = fns[0];
-					assert.isTrue(spy.calledOnce);
-					// XXX assert arguments
-				},
-				'and we call it with the same data': {
-					topic: function(fns) {
-						var webmention = fns[1],
-						cb = this.callback;
+				webmention = require('../lib/webmention');
+
+				return webmention;
+			},
+			teardown: function() {
+				return clock.restore();
+			},
+			'it works': function(err) {
+				assert.ifError(err);
+			},
+			'it exports a function': function(err, webmention) {
+				assert.isFunction(webmention);
+			},
+			'and we set up persistence mocks': wrapFsMocks({
+				'and we call the module with a post': {
+					topic: function() {
+						var cb = this.callback;
+
+						setServerCallback(cb);
 
 						webmention('http://example.com/socute',
-						           // Note: these are smaller because JS dates are in milliseconds but we're passing seconds
 						           100,
 						           data.singleLink,
 						           function(err) {
-							           cb(err, fns);
+							           cb(err);
 						           });
 					},
 					'it works': function(err) {
 						assert.ifError(err);
 					},
-					'the spy wasn\'t called again': function(err, fns) {
-						var spy = fns[0];
-						assert.isTrue(spy.calledOnce);
+					'the server received the data': function(err, str) {
+						assert.isTrue(str.includes('example.com'));
+						assert.isTrue(str.includes('new-puppy'));
 					},
-					'and we call it with a newer timestamp': {
-						topic: function(fns) {
-							var webmention = fns[1],
-							cb = this.callback;
+					'and we call it with the same data': {
+						topic: function() {
+							var cb = this.callback;
 
-							// This shouldn't matter, but just in case, we set the clock to be past the edited timestamp
-							clock.tick(100 * 1000);
-
+							console.log('dfwa_FOOBAR');
 							webmention('http://example.com/socute',
-							           200,
+							           // Note: these are smaller because JS dates are in milliseconds but we're passing seconds
+							           100,
 							           data.singleLink,
 							           function(err) {
-								           cb(err, fns);
+								           if (err) {
+									           cb(err);
+								           }
 							           });
-						},
-						teardown: function() {
-							return clock.tick(-100 * 1000);
 						},
 						'it works': function(err) {
 							assert.ifError(err);
 						},
-						'the spy was called a second time': function(err, fns) {
-							var spy = fns[0];
-							assert.isTrue(spy.calledTwice);
-							// XXX assert arguments
+						'the server received the data': function(err, str) {
+							assert.isTrue(str.includes('example.com'));
+							assert.isTrue(str.includes('new-puppy'));
 						},
-						// XXX find a way to not nest this so deeply - it
-						// has to be this way currently so the Sinon spy is
-						// called in the right order
-						'and we call it with a post with multiple links': {
-							topic: function(fns) {
-								var webmention = fns[1],
-								    cb = this.callback;
+						'and we call it with a newer timestamp': {
+							topic: function() {
+								var cb = this.callback;
 
-								webmention('http://example.com/morecuteness',
+								// This shouldn't matter, but just in case, we set the clock to be past the edited timestamp
+								clock.tick(100 * 1000);
+
+								webmention('http://example.com/socute',
 								           200,
-								           data.multipleLinks,
+								           data.singleLink,
 								           function(err) {
-									           cb(err, fns);
+									           if (err) {
+										           cb(err);
+									           }
 								           });
+							},
+							teardown: function() {
+								return clock.tick(-100 * 1000);
 							},
 							'it works': function(err) {
 								assert.ifError(err);
 							},
-							'the spy was called two more times': function(err, fns) {
-								var spy = fns[0];
-								assert.equal(spy.callCount, 4);
-								// XXX args
-							}
-						}
+							'the server received the data': function(err, str) {
+								assert.isTrue(str.includes('example.com'));
+								assert.isTrue(str.includes('new-puppy'));								
+							},
+							// XXX find a way to not nest this so deeply - it
+							// has to be this way currently so the Sinon spy is
+							// called in the right order
+							'and we call it with a post with multiple links': {
+								topic: function() {
+									var cb = this.callback;
 
+									setServerCallback(cb);
+
+									webmention('http://example.com/morecuteness',
+									           200,
+									           data.multipleLinks,
+									           function(err) {
+										           if (err) {
+											           cb(err);
+										           }
+									           });
+								},
+								'it works': function(err) {
+									assert.ifError(err);
+								},
+								'the server received the data': function(err, str) {
+									assert.isTrue(str.includes('example.com'));
+									assert.isTrue(str.includes('new-puppy'));
+								}
+							}
+
+						}
 					}
 				}
-			}
-		})
+			})
+		}
 	}
 }).export(module);
