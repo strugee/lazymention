@@ -30,7 +30,7 @@ var vows = require('perjury'),
     path = require('path'),
     noopLog = require('./lib/log');
 
-vows.describe('HTTP retrieval module').addBatch({
+vows.describe('h-entry canonicalization module').addBatch({
 	'When we set up a server to serve posts': {
 		topic: function() {
 			var app = express();
