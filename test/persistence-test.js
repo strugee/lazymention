@@ -25,6 +25,7 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     _ = require('lodash'),
+    bunyan = require('bunyan'),
     persistenceutil = require('./lib/persistence'),
     wrapFsMocks = persistenceutil.wrapFsMocks;
 
@@ -36,20 +37,18 @@ vows.describe('persistence module').addBatch({
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports the right functions': function(err, db) {
-			assert.isFunction(db.configure);
-			assert.isFunction(db.get);
-			assert.isFunction(db.set);
+		'it exports a factory function': function(err, createDb) {
+			assert.isFunction(createDb);
 		},
-		'and we mock out the `fs` module': wrapFsMocks(false, {
-			'and we configure the module with a path': {
-				topic: function(db) {
-					db.configure('/tmp');
-					return db;
-				},
-				'it works': function(err) {
-					assert.ifError(err);
-				},
+		'and we create a persistence database instance': {
+			topic: function(createDb) {
+				return createDb(new bunyan({name: 'noop', streams: []}), '/tmp');
+			},
+			'it has the right functions': function(err, db) {
+				assert.isFunction(db.get);
+				assert.isFunction(db.set);
+			},
+			'and we mock out the `fs` module': wrapFsMocks(false, {
 				'and we set a key': {
 					topic: function(db) {
 						var cb = this.callback;
@@ -105,7 +104,7 @@ vows.describe('persistence module').addBatch({
 						assert.isTrue(_.isEmpty(result));
 					}
 				}
-			}
-		})
+			})
+		}
 	}
 }).export(module);

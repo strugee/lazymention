@@ -24,7 +24,7 @@ License along with lazymention. If not, see
 
 'use strict';
 
-var app = require('../lib/app.js').app,
+var makeApp = require('../lib/app.js').makeApp,
     persistence = require('../lib/persistence'),
     log = require('../lib/log');
 
@@ -47,7 +47,8 @@ var argv = require('yargs')
 
 console.log(agpl_notice);
 
-persistence.configure(argv.storage);
+var db = persistence(log, argv.storage),
+    app = makeApp(log, db);
 
 var server = app.listen(argv.port, argv.address, function() {
 	var host = server.address().address;

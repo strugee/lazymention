@@ -31,8 +31,6 @@ var assert = require('perjury').assert,
 function buildMockSetup(configurePath) {
 	return {
 		topic: function(passthrough) {
-			if (configurePath) require('../../lib/persistence').configure('/tmp');
-
 			mockFs({
 				'/tmp': mockFs.directory()
 			});

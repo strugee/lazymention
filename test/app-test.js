@@ -24,7 +24,9 @@ License along with lazymention. If not, see
 
 var vows = require('perjury'),
     assert = vows.assert,
-    express = require('express');
+    express = require('express'),
+    bunyan = require('bunyan'),
+    db = require('../lib/persistence');
 
 vows.describe('app module test').addBatch({
 	'When we get the app module': {
@@ -34,12 +36,33 @@ vows.describe('app module test').addBatch({
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports an Express application': function(err, app) {
-			assert.isFunction(app.app);
+		'it exports an Express application factory function': function(err, app) {
+			assert.isFunction(app.makeApp);
 		},
-		'it exports an Express Router': function(err, app) {
-			assert.isFunction(app.router);
-			assert.isTrue(express.Router.isPrototypeOf(app.router));
+		'it exports an Express Router factory function': function(err, app) {
+			assert.isFunction(app.makeRouter);
+		},
+		'and we call makeApp()': {
+			topic: function(app) {
+				var log = new bunyan({name: 'noop', streams: []});
+
+				return app.makeApp(log, db(log, '/tmp'));
+			},
+			'it returns an Express application': function(err, app) {
+				assert.isFunction(app);
+				assert.isFunction(app.listen);
+			}
+		},
+		'and we call makeRouter()': {
+			topic: function(app) {
+				var log = new bunyan({name: 'noop', streams: []});
+
+				return app.makeRouter(log, db(log, '/tmp'));
+			},
+			'it exports an Express Router': function(err, router) {
+				assert.isFunction(router);
+				assert.isTrue(express.Router.isPrototypeOf(router));
+			}
 		}
 	}
 }).export(module);
