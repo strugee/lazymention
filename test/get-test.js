@@ -24,7 +24,8 @@ License along with lazymention. If not, see
 
 var vows = require('perjury'),
     assert = vows.assert,
-    http = require('http');
+    http = require('http'),
+    noopLog = require('./lib/log');
 
 vows.describe('HTTP retrieval module').addBatch({
 	'When we set up a dummy HTTP server': {
@@ -65,73 +66,84 @@ vows.describe('HTTP retrieval module').addBatch({
 			'it works': function(err) {
 				assert.ifError(err);
 			},
-			'it exports a function': function(err, get) {
-				assert.isFunction(get);
+			'it exports a factory function': function(err, createGetter) {
+				assert.isFunction(createGetter);
 			},
-			'and we retrieve a URL from the dummy server': {
-				topic: function(get) {
-					get('http://localhost:57810', this.callback);
+			'and we create a getter': {
+				topic: function(createGetter) {
+					return createGetter(noopLog);
 				},
 				'it works': function(err) {
 					assert.ifError(err);
 				},
-				'we get the right data back': function(err, data) {
-					assert.isString(data);
-					assert.equal(data, 'Hello IndieWeb!');
-				}
-			},
-			'and we try retrieving from a nonexistant server': {
-				topic: function(get) {
-					var cb = this.callback;
+				'we get back a function': function(err, get) {
+					assert.isFunction(get);
+				},
+				'and we retrieve a URL from the dummy server': {
+					topic: function(get) {
+						get('http://localhost:57810', this.callback);
+					},
+					'it works': function(err) {
+						assert.ifError(err);
+					},
+					'we get the right data back': function(err, data) {
+						assert.isString(data);
+						assert.equal(data, 'Hello IndieWeb!');
+					}
+				},
+				'and we try retrieving from a nonexistant server': {
+					topic: function(get) {
+						var cb = this.callback;
 
-					get('http://localhost:29834', function(err, data) {
-						if (data) {
-							cb(new Error('unexpected success'), data);
-							return;
-						}
+						get('http://localhost:29834', function(err, data) {
+							if (data) {
+								cb(new Error('unexpected success'), data);
+								return;
+							}
 
-						cb(undefined, err);
-					});
+							cb(undefined, err);
+						});
+					},
+					'it works': function(err) {
+						assert.ifError(err);
+					},
+					'the error is propogated back to us': function(err, result) {
+						assert.isTrue(result instanceof Error);
+						assert.equal('ECONNREFUSED', result.errno);
+					}
 				},
-				'it works': function(err) {
-					assert.ifError(err);
-				},
-				'the error is propogated back to us': function(err, result) {
-					assert.isTrue(result instanceof Error);
-					assert.equal('ECONNREFUSED', result.errno);
-				}
-			},
-			'and we retrieve a route that returns 404': {
-				topic: function(get) {
-					var cb = this.callback;
+				'and we retrieve a route that returns 404': {
+					topic: function(get) {
+						var cb = this.callback;
 
-					get('http://localhost:57810/generate_404', function(err, data) {
-						if (data) {
-							cb(new Error('unexpected success'), data);
-							return;
-						}
+						get('http://localhost:57810/generate_404', function(err, data) {
+							if (data) {
+								cb(new Error('unexpected success'), data);
+								return;
+							}
 
-						cb(undefined, err);
-					});
+							cb(undefined, err);
+						});
+					},
+					'it works': function(err) {
+						assert.ifError(err);
+					},
+					'the 4xx status code triggers an error condition': function(err, result) {
+						assert.isTrue(result instanceof Error);
+						assert.isTrue(result.message.includes('returned HTTP 404'));
+					}
 				},
-				'it works': function(err) {
-					assert.ifError(err);
-				},
-				'the 4xx status code triggers an error condition': function(err, result) {
-					assert.isTrue(result instanceof Error);
-					assert.isTrue(result.message.includes('returned HTTP 404'));
-				}
-			},
-			'and we ask what User Agent we send': {
-				topic: function(get) {
-					get('http://localhost:57810/get_ua', this.callback);
-				},
-				'it works': function(err) {
-					assert.ifError(err);
-				},
-				'we sent the right User-Agent': function(err, data) {
-					assert.isTrue(data.includes('node.js/'));
-					assert.isTrue(data.includes('lazymention/1.0.0'));
+				'and we ask what User Agent we send': {
+					topic: function(get) {
+						get('http://localhost:57810/get_ua', this.callback);
+					},
+					'it works': function(err) {
+						assert.ifError(err);
+					},
+					'we sent the right User-Agent': function(err, data) {
+						assert.isTrue(data.includes('node.js/'));
+						assert.isTrue(data.includes('lazymention/1.0.0'));
+					}
 				}
 			}
 		}
