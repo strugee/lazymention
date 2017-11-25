@@ -41,7 +41,7 @@ vows.describe('Webmention module').addBatch({
 		topic: function() {
 			// XXX is this coupling too much to implementation?
 			var spy = sinon.spy(function(source, destination, cb) {
-				cb();
+				cb(undefined, {success: true});
 			    }),
 			    module = proxyquire('../lib/webmention', {
 				'send-webmention': spy
