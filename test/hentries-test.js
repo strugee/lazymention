@@ -27,7 +27,8 @@ var vows = require('perjury'),
     mf2 = require('microformat-node'),
     express = require('express'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    noopLog = require('./lib/log');
 
 vows.describe('HTTP retrieval module').addBatch({
 	'When we set up a server to serve posts': {
@@ -51,50 +52,58 @@ vows.describe('HTTP retrieval module').addBatch({
 			'it works': function(err) {
 				assert.ifError(err);
 			},
-			'it exports a function': function(err, handleNode) {
-				assert.isFunction(handleNode);
+			'it exports a factory function': function(err, makeHentriesHandler) {
+				assert.isFunction(makeHentriesHandler);
 			},
-			// XXX make more sample files
-			'and we pass it an h-feed with some h-entries': {
-				topic: function(handleNode) {
-					var cb = this.callback;
+			'and we create a node handler instance': {
+				topic: function(makeHentriesHandler) {
+					return makeHentriesHandler(noopLog);
+				},
+				'it returns a  function': function(err, handleNode) {
+					assert.isFunction(handleNode);
+				},
+				// XXX make more sample files
+				'and we pass it an h-feed with some h-entries': {
+					topic: function(handleNode) {
+						var cb = this.callback;
 
-					fs.readFile(path.join(__dirname, 'data/h-feed-with-h-entries.html'), function(err, data) {
-						if (err) {
-							cb(err);
-							return;
-						}
-
-						mf2.get({html: data.toString()}, function(_err, _data) {
+						fs.readFile(path.join(__dirname, 'data/h-feed-with-h-entries.html'), function(err, data) {
 							if (err) {
 								cb(err);
 								return;
 							}
 
-							handleNode('http://localhost:47298', _data.items[0], function(err, arr) {
+							mf2.get({html: data.toString()}, function(_err, _data) {
 								if (err) {
 									cb(err);
 									return;
 								}
 
-								cb(undefined, arr);
+								handleNode('http://localhost:47298', _data.items[0], function(err, arr) {
+									if (err) {
+										cb(err);
+										return;
+									}
+
+									cb(undefined, arr);
+								});
 							});
 						});
-					});
-				},
-				'it works': function(err, arr) {
-					assert.ifError(err);
-				},
-				'it has the structure we expect': function(err, arr) {
-					assert.isArray(arr);
-					arr.forEach(function(obj) {
-						assert.isObject(obj);
-						assert.equal(obj.resolvedUrl.slice(0, -1), 'http://localhost:47298/entry-');
-						assert.isString(obj.html);
-					});
-				},
-				'it has the right length': function(err, arr) {
-					assert.equal(arr.length, 2);
+					},
+					'it works': function(err, arr) {
+						assert.ifError(err);
+					},
+					'it has the structure we expect': function(err, arr) {
+						assert.isArray(arr);
+						arr.forEach(function(obj) {
+							assert.isObject(obj);
+							assert.equal(obj.resolvedUrl.slice(0, -1), 'http://localhost:47298/entry-');
+							assert.isString(obj.html);
+						});
+					},
+					'it has the right length': function(err, arr) {
+						assert.equal(arr.length, 2);
+					}
 				}
 			}
 		}
