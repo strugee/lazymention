@@ -44,7 +44,6 @@ vows.describe('h-entry canonicalization module').addBatch({
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-
 		'and we require the module': {
 			topic: function() {
 				return require('../lib/hentries');
@@ -58,6 +57,9 @@ vows.describe('h-entry canonicalization module').addBatch({
 			'and we create a node handler instance': {
 				topic: function(makeHentriesHandler) {
 					return makeHentriesHandler(noopLog);
+				},
+				'it works': function(err) {
+					assert.ifError(err);
 				},
 				'it returns a  function': function(err, handleNode) {
 					assert.isFunction(handleNode);
