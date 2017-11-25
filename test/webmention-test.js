@@ -27,9 +27,9 @@ var vows = require('perjury'),
     mockFs = require('mock-fs'),
     proxyquire = require('proxyquire'),
     sinon = require('sinon'),
-    bunyan = require('bunyan'),
+    noopLog = require('./lib/log'),
     persistenceutil = require('./lib/persistence'),
-    db = require('../lib/persistence')(new bunyan({name: 'noop', streams: []}), '/tmp'),
+    db = require('../lib/persistence')(noopLog, '/tmp'),
     wrapFsMocks = persistenceutil.wrapFsMocks,
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
@@ -64,7 +64,7 @@ vows.describe('Webmention module').addBatch({
 		},
 		'and we create a Webmention sender': {
 			topic: function(fns) {
-				return [fns[0], fns[1](new bunyan({name: 'noop', streams: []}), db)];
+				return [fns[0], fns[1](noopLog, db)];
 			},
 			'it works': function(err) {
 				assert.ifError(err);

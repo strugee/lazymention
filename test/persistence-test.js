@@ -25,7 +25,7 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     _ = require('lodash'),
-    bunyan = require('bunyan'),
+    noopLog = require('./lib/log'),
     persistenceutil = require('./lib/persistence'),
     wrapFsMocks = persistenceutil.wrapFsMocks;
 
@@ -42,7 +42,7 @@ vows.describe('persistence module').addBatch({
 		},
 		'and we create a persistence database instance': {
 			topic: function(createDb) {
-				return createDb(new bunyan({name: 'noop', streams: []}), '/tmp');
+				return createDb(noopLog, '/tmp');
 			},
 			'it has the right functions': function(err, db) {
 				assert.isFunction(db.get);

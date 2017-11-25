@@ -25,7 +25,7 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     express = require('express'),
-    bunyan = require('bunyan'),
+    noopLog = require('./lib/log'),
     db = require('../lib/persistence');
 
 vows.describe('app module test').addBatch({
@@ -44,9 +44,7 @@ vows.describe('app module test').addBatch({
 		},
 		'and we call makeApp()': {
 			topic: function(app) {
-				var log = new bunyan({name: 'noop', streams: []});
-
-				return app.makeApp(log, db(log, '/tmp'));
+				return app.makeApp(noopLog, db(noopLog, '/tmp'));
 			},
 			'it returns an Express application': function(err, app) {
 				assert.isFunction(app);
@@ -55,9 +53,7 @@ vows.describe('app module test').addBatch({
 		},
 		'and we call makeRouter()': {
 			topic: function(app) {
-				var log = new bunyan({name: 'noop', streams: []});
-
-				return app.makeRouter(log, db(log, '/tmp'));
+				return app.makeRouter(noopLog, db(noopLog, '/tmp'));
 			},
 			'it exports an Express Router': function(err, router) {
 				assert.isFunction(router);
