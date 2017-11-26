@@ -48,6 +48,9 @@ var argv = require('yargs')
 		    port: 8000,
 		    logger: true
 	    })
+	    .boolean('logger')
+	    .number('port')
+	    .string(['address', 'storage', 'logfile'])
 	    .demandOption('storage')
 	    .config()
 	    .env('LAZYMENTION')
