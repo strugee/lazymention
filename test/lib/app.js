@@ -25,13 +25,12 @@
 // TODO test this file
 
 var assert = require('perjury').assert,
-    bunyan = require('bunyan'),
+    noopLog = require('./log'),
     _ = require('lodash');
 
 var appSetup = {
 	topic: function() {
-		var log = new bunyan({name: 'noop', streams: []}),
-		    app = require('../../lib/app').makeApp(log, require('../../lib/persistence')(log, '/tmp')),
+		var app = require('../../lib/app').makeApp(noopLog, require('../../lib/persistence')(noopLog, '/tmp')),
 		    cb = this.callback;
 
 		var server = app.listen(5320, 'localhost', function(err) {
