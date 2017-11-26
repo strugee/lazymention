@@ -40,17 +40,19 @@ var argv = require('yargs')
 		    address: 'Address that the HTTP server will bind to',
 		    storage: 'Writable filesytem directory the daemon will persist state to',
 		    logger: 'Whether to write logs',
-		    logfile: 'Full path to the file to stream logs (Bunyan-formatted JSON) to'
+		    logfile: 'Full path to the file to stream logs (Bunyan-formatted JSON) to',
+		    logLevel: 'Bunyan loglevel (https://github.com/trentm/node-bunyan#levels)'
 	    })
 	    .default({
 		    config: '/etc/lazymention.json',
 		    address: '0.0.0.0',
 		    port: 8000,
-		    logger: true
+		    logger: true,
+		    logLevel: 'info'
 	    })
 	    .boolean('logger')
 	    .number('port')
-	    .string(['address', 'storage', 'logfile'])
+	    .string(['address', 'storage', 'logfile', 'logLevel'])
 	    .demandOption('storage')
 	    .config()
 	    .env('LAZYMENTION')
@@ -67,7 +69,8 @@ var logParams = {
 		err: bunyan.stdSerializers.err,
 		req: bunyan.stdSerializers.req,
 		res: bunyan.stdSerializers.res
-	}
+	},
+	level: argv.logLevel
 };
 
 if (argv.logger === false) {
@@ -77,7 +80,6 @@ if (argv.logger === false) {
 } else {
 	logParams.streams = [{stream: process.stdout}];
 }
-
 
 var log = bunyan.createLogger(logParams),
     createDb = createDbFactory(argv.storage),
