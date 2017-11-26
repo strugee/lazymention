@@ -26,7 +26,7 @@ License along with lazymention. If not, see
 
 var makeApp = require('../lib/app.js').makeApp,
     createDbFactory = require('../lib/persistence'),
-    log = require('../lib/log');
+    bunyan = require('bunyan');
 
 var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
                    'License AGPLv3+: GNU Affero GPL version 3 or later <https://gnu.org/licenses/agpl-3.0.html>.',
@@ -35,8 +35,19 @@ var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
 var argv = require('yargs')
 	    .usage('Usage: $0 [options]')
 	    .alias({'help': 'h', 'config': 'c', 'port': 'p', 'address': 'a', 'storage': 's'})
-    .describe({port: 'Port that the HTTP server will bind to', address: 'Address that the HTTP server will bind to', storage: 'Writable filesytem directory the daemon will persist state to'})
-	    .default({ config: '/etc/lazymention.json', address: '0.0.0.0', port: 8000 })
+	    .describe({
+		    port: 'Port that the HTTP server will bind to',
+		    address: 'Address that the HTTP server will bind to',
+		    storage: 'Writable filesytem directory the daemon will persist state to',
+		    logger: 'Whether to write logs',
+		    logfile: 'Full path to the file to stream logs (Bunyan-formatted JSON) to'
+	    })
+	    .default({
+		    config: '/etc/lazymention.json',
+		    address: '0.0.0.0',
+		    port: 8000,
+		    logger: true
+	    })
 	    .demandOption('storage')
 	    .config()
 	    .env('LAZYMENTION')
@@ -47,7 +58,26 @@ var argv = require('yargs')
 
 console.log(agpl_notice);
 
-var createDb = createDbFactory(argv.storage),
+var logParams = {
+	name: 'lazymention',
+	serializers: {
+		err: bunyan.stdSerializers.err,
+		req: bunyan.stdSerializers.req,
+		res: bunyan.stdSerializers.res
+	}
+};
+
+if (argv.logger === false) {
+	logParams.streams = [{path: "/dev/null"}];
+} else if (argv.logfile) {
+	logParams.streams = [{path: argv.logfile}];
+} else {
+	logParams.streams = [{stream: process.stdout}];
+}
+
+
+var log = bunyan.createLogger(logParams),
+    createDb = createDbFactory(argv.storage),
     app = makeApp(log, createDb);
 
 var server = app.listen(argv.port, argv.address, function() {
