@@ -37,74 +37,84 @@ vows.describe('persistence module').addBatch({
 		'it works': function(err) {
 			assert.ifError(err);
 		},
-		'it exports a factory function': function(err, createDb) {
-			assert.isFunction(createDb);
+		// I hate this so damn much
+		'it exports a factory creation function': function(err, createDbFactory) {
+			assert.isFunction(createDbFactory);
 		},
-		'and we create a persistence database instance': {
-			topic: function(createDb) {
-				return createDb(noopLog, '/tmp');
+		'and we create a persistence database factory': {
+			topic: function(createDbFactory) {
+				debugger;
+				return createDbFactory('/tmp');
 			},
-			'it has the right functions': function(err, db) {
-				assert.isFunction(db.get);
-				assert.isFunction(db.set);
+			'it we get back a factory function': function(err, createDb) {
+				assert.isFunction(createDb);
 			},
-			'and we mock out the `fs` module': wrapFsMocks(false, {
-				'and we set a key': {
-					topic: function(db) {
-						var cb = this.callback;
-						db.set('meaning_of_life', 42, function(err) {
-							cb(err, db);
-						});
-					},
-					'it works': function(err) {
-						assert.ifError(err);
-					},
-					'and we get the key': {
+			'and we create a persistence database instance': {
+				topic: function(createDb) {
+					return createDb(noopLog);
+				},
+				'it has the right functions': function(err, db) {
+					assert.isFunction(db.get);
+					assert.isFunction(db.set);
+				},
+				'and we mock out the `fs` module': wrapFsMocks(false, {
+					'and we set a key': {
 						topic: function(db) {
-							db.get('meaning_of_life', this.callback);
+							var cb = this.callback;
+							db.set('meaning_of_life', 42, function(err) {
+								cb(err, db);
+							});
+						},
+						'it works': function(err) {
+							assert.ifError(err);
+						},
+						'and we get the key': {
+							topic: function(db) {
+								db.get('meaning_of_life', this.callback);
+							},
+							'it worked': function(err) {
+								assert.ifError(err);
+							},
+							'it has the value we set': function(err, result) {
+								assert.isNumber(result);
+								assert.equal(result, 42);
+							}
+						}
+					},
+					'and we set a key with a slash': {
+						topic: function(db) {
+							var cb = this.callback;
+							db.set('lazymention/subkey', {foo: 'bar'}, function(err) {
+								cb(err, db);
+							});
+						},
+						'it works': function(err) {
+							assert.ifError(err);
+						},
+						'and we get the key': {
+							topic: function(db) {
+								db.get('lazymention/subkey', this.callback);
+							},
+							'it worked': function(err, obj) {
+								assert.ifError(err);
+								assert.equal(obj.foo, 'bar');
+							}
+						}
+					},
+					'and we get a nonexistant key': {
+						topic: function(db) {
+							db.get('lolnope', this.callback);
 						},
 						'it worked': function(err) {
 							assert.ifError(err);
 						},
-						'it has the value we set': function(err, result) {
-							assert.isNumber(result);
-							assert.equal(result, 42);
+						'it gave us an empty object': function(err, result) {
+							assert.isObject(result);
+							assert.isTrue(_.isEmpty(result));
 						}
 					}
-				},
-				'and we set a key with a slash': {
-					topic: function(db) {
-						var cb = this.callback;
-						db.set('lazymention/subkey', {foo: 'bar'}, function(err) {
-							cb(err, db);
-						});
-					},
-					'it works': function(err) {
-						assert.ifError(err);
-					},
-					'and we get the key': {
-						topic: function(db) {
-							db.get('lazymention/subkey', this.callback);
-						},
-						'it worked': function(err, obj) {
-							assert.ifError(err);
-							assert.equal(obj.foo, 'bar');
-						}
-					}
-				},
-				'and we get a nonexistant key': {
-					topic: function(db) {
-						db.get('lolnope', this.callback);
-					},
-					'it worked': function(err) {
-						assert.ifError(err);
-					},
-					'it gave us an empty object': function(err, result) {
-						assert.isObject(result);
-						assert.isTrue(_.isEmpty(result));
-					}
-				}
-			})
+				})
+			}
 		}
 	}
 }).export(module);

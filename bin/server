@@ -25,7 +25,7 @@ License along with lazymention. If not, see
 'use strict';
 
 var makeApp = require('../lib/app.js').makeApp,
-    persistence = require('../lib/persistence'),
+    createDbFactory = require('../lib/persistence'),
     log = require('../lib/log');
 
 var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
@@ -47,8 +47,8 @@ var argv = require('yargs')
 
 console.log(agpl_notice);
 
-var db = persistence(log, argv.storage),
-    app = makeApp(log, db);
+var createDb = createDbFactory(argv.storage),
+    app = makeApp(log, createDb);
 
 var server = app.listen(argv.port, argv.address, function() {
 	var host = server.address().address;

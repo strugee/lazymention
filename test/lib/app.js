@@ -30,7 +30,7 @@ var assert = require('perjury').assert,
 
 var appSetup = {
 	topic: function() {
-		var app = require('../../lib/app').makeApp(noopLog, require('../../lib/persistence')(noopLog, '/tmp')),
+		var app = require('../../lib/app').makeApp(noopLog, require('../../lib/persistence')('/tmp')),
 		    cb = this.callback;
 
 		var server = app.listen(5320, 'localhost', function(err) {
