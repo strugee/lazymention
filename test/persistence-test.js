@@ -29,6 +29,32 @@ var vows = require('perjury'),
     persistenceutil = require('./lib/persistence'),
     wrapFsMocks = persistenceutil.wrapFsMocks;
 
+var getNonexistantKey = {
+	topic: function(db) {
+		db.get('lolnope', this.callback);
+	},
+	'it worked': function(err) {
+		assert.ifError(err);
+	},
+	'it gave us an empty object': function(err, result) {
+		assert.isObject(result);
+		assert.isTrue(_.isEmpty(result));
+	}
+};
+
+var getKey = {
+	topic: function(db) {
+		db.get('meaning_of_life', this.callback);
+	},
+	'it worked': function(err) {
+		assert.ifError(err);
+	},
+	'it has the value we set': function(err, result) {
+		assert.isNumber(result);
+		assert.equal(result, 42);
+	}
+};
+
 vows.describe('persistence module').addBatch({
 	'When we require the module': {
 		topic: function() {
@@ -68,18 +94,7 @@ vows.describe('persistence module').addBatch({
 						'it works': function(err) {
 							assert.ifError(err);
 						},
-						'and we get the key': {
-							topic: function(db) {
-								db.get('meaning_of_life', this.callback);
-							},
-							'it worked': function(err) {
-								assert.ifError(err);
-							},
-							'it has the value we set': function(err, result) {
-								assert.isNumber(result);
-								assert.equal(result, 42);
-							}
-						}
+						'and we get the key': getKey
 					},
 					'and we set a key with a slash': {
 						topic: function(db) {
@@ -99,20 +114,19 @@ vows.describe('persistence module').addBatch({
 								assert.ifError(err);
 								assert.equal(obj.foo, 'bar');
 							}
+						},
+						'and we set up a new instance to bust the cache': {
+							topic: function() {
+								return require('../lib/persistence')('/tmp')(noopLog);
+							},
+							'it worked': function(err) {
+								assert.ifError(err);
+							},
+							'and we get a key': getKey,
+							'and we get a nonexistant key': getNonexistantKey
 						}
 					},
-					'and we get a nonexistant key': {
-						topic: function(db) {
-							db.get('lolnope', this.callback);
-						},
-						'it worked': function(err) {
-							assert.ifError(err);
-						},
-						'it gave us an empty object': function(err, result) {
-							assert.isObject(result);
-							assert.isTrue(_.isEmpty(result));
-						}
-					}
+					'and we get a nonexistant key': getNonexistantKey
 				})
 			}
 		}
