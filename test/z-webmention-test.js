@@ -22,6 +22,28 @@ License along with lazymention. If not, see
 
 'use strict';
 
+/*
+
+Yes, this file starts with a z. This is so that this test is ordered
+the absolute last in the test suite.
+
+The reason we need to do this is because it mucks with the global
+state by mocking out the `send-webmention` module with a Sinon
+spy. That bit of state _leaks_ out of the test and into the
+environment, where it's hit by other tests trying to fire
+callbacks. This means that a *completely separate test* will actually
+jump into this test by calling its Perjury callback, and this does in
+fact happen when the ordering is right. So we go with the cheesy
+solution and simply (vaguely) guarantee that it's ordered last, so
+everybody else is done with the global environment by the time we go
+and fuck it all up with this terrifying hellscape of funhouse mirrors
+and scary clowns.
+
+Yes, this is a god-awful design. Yes, I am quite ashamed of it. Yes, I
+plan to fix it up eventually. No, I don't have time right now.
+
+*/
+
 var vows = require('perjury'),
     assert = vows.assert,
     mockFs = require('mock-fs'),
