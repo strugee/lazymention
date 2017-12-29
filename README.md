@@ -53,6 +53,14 @@ Here's what you can configure:
 
 The `storage` and `domains` options are required. If you don't want to use a whitelist you can set `domains` to `[]`, but you're _strongly_ discouraged from doing so because of the security implications. In fact, the reason you have to set this manually is to make sure you know what you're doing.
 
+## Using the API
+
+There's exactly one API endpoint, `/jobs/submit`. To trigger lazymention, POST to this endpoint with a JSON payload in the body. The JSON should contain a `url` key whose value is the URL to crawl.
+
+If everything goes well, you'll get back 202 Accepted. If something went wrong, you'll get back 400 Bad Request, unless the domain of the URL you provided isn't in the whitelist in which case you'll get 403 Forbidden.
+
+In the future the reponse will contain a URL that lets you check the status of your job, but in the meantime all you get back is a lame 2xx status code.
+
 ## Author
 
 AJ Jordan <alex@strugee.net>
