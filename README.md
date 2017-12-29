@@ -65,6 +65,8 @@ In the future the reponse will contain a URL that lets you check the status of y
 
 lazymention has an embedding API, in case you want to reuse its functionality in another Node app. You can access both the overall Express application or just the job submission route.
 
+It is safe to concurrently embed unlimited instances of either in the same process so long as they don't share the same data directory.
+
 Note: your app would have to be AGPL 3.0 or later to comply with the licensing terms, but if this is a big problem I might consider relaxing the requirements so just ping me.
 
 ### Express application
