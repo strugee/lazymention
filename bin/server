@@ -39,6 +39,7 @@ var argv = require('yargs')
 		    port: 'Port that the HTTP server will bind to',
 		    address: 'Address that the HTTP server will bind to',
 		    storage: 'Writable filesytem directory the daemon will persist state to',
+		    domains: 'Whitelist of domains to allow in job submissions',
 		    logger: 'Whether to write logs',
 		    logfile: 'Full path to the file to stream logs (Bunyan-formatted JSON) to',
 		    logLevel: 'Bunyan loglevel (https://github.com/trentm/node-bunyan#levels)'
@@ -53,13 +54,20 @@ var argv = require('yargs')
 	    .boolean('logger')
 	    .number('port')
 	    .string(['address', 'storage', 'logfile', 'logLevel'])
-	    .demandOption('storage')
+	    .array('domains')
+	    .demandOption(['storage', 'domains'])
 	    .config()
 	    .env('LAZYMENTION')
 	    .help()
 	    .version()
 	    .epilog(agpl_notice)
 	    .argv;
+
+// Clean up argv.domains in case it's set via the environment; see yargs/yargs#821
+// XXX use process.env to do something a little more intelligent here
+if (argv.domains.length === 1) {
+	argv.domains = argv.domains[0].split(',').map(str => str.trim());
+}
 
 console.log(agpl_notice);
 

@@ -23,7 +23,7 @@ lazymention makes some maintainability tradeoffs that may result in denial-of-se
 * lazymention's handling of microformats2 structures within pages is rather brittle. For example, if you mark an element as both an `h-entry` _and_ an `h-feed`, lazymention will probably crash. I will take PRs to fix these problems, especially those caused by nonmalicious markup, but in the meantime your process will be very dead.
 * lazymention does not bother to check if it's sending Webmentions to `localhost` or loopback addresses. See the [Security Considerations section][] of the Webmention spec.
 
-Please be aware of these constraints before running lazymention in production.
+Please be aware of these constraints before running lazymention in production. The `domains` option should help with this.
 
 Also, lazymention has no idea how to recurse into subpages of indexes. In the real world, I expect that this will not actually be a real problem.
 
@@ -33,7 +33,7 @@ lazymention will install a command called, fittingly, `lazymention`. You need to
 
 You can provide configuration options in three ways: CLI flags, environment variables, and JSON configuration files - CLI flags override environment variables and environment variables override JSON configs. The default config file location is `/etc/lazymention.json`, but you can override this by passing `-c <path_to_config.json>`.
 
-If you configure with environment variables, just prefix the configuration values with `LAZYMENTION_`. CLI flags are just prefixed with `--`, as you'd expect - just run `lazymention --help` if this is confusing.
+If you configure with environment variables, just prefix the configuration values with `LAZYMENTION_`. CLI flags are just prefixed with `--`, as you'd expect - just run `lazymention --help` if this is confusing. You can pass more than one value for `--domains` (e.g. `--domains example.com example.net`), as well as passing `--domains` more than once (e.g. `--domains example.com --domains example.net`). If you need to specify more than one domain via environment variables, separate them using `,`.
 
 You should also set `NODE_ENV=production` in the environment, regardless of how you're configuring lazymention.
 
@@ -49,6 +49,9 @@ Here's what you can configure:
 | `logger`   | Whether to have the logger write logs.                       | True      |
 | `logfile`  | Where to write logs to.                                      | stdout    |
 | `logLevel` | [Bunyan loglevel][] for the logger.                          | `info`    |
+| `domains`  | Whitelist of domains to allow in job submissions.            | None      |
+
+The `storage` and `domains` options are required. If you don't want to use a whitelist you can set `domains` to `[]`, but you're _strongly_ discouraged from doing so because of the security implications. In fact, the reason you have to set this manually is to make sure you know what you're doing.
 
 ## Author
 
