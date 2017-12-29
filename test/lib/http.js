@@ -26,13 +26,24 @@ License along with lazymention. If not, see
 
 var http = require('http');
 
-function httpPost(path, data, headers, callback) {
+function httpPost(port, path, data, headers, callback) {
+	// Make port optional
+	if (typeof port === 'string') {
+		callback = headers;
+		headers = data;
+		data = path;
+		path = port;
+		port = 5320;
+	}
+
+	// Make headers optional
 	if (!callback) {
 		callback = headers;
 		headers = {};
 	}
+
 	var opts = {
-		port: 5320,
+		port: port,
 		host: 'localhost',
 		method: 'POST',
 		path: path,
@@ -50,8 +61,15 @@ function httpPost(path, data, headers, callback) {
 	req.end(data);
 };
 
-function httpPostJSON(path, data, callback) {
-	httpPost(path, JSON.stringify(data), {'Content-Type': 'application/json'}, callback);
+function httpPostJSON(port, path, data, callback) {
+	if (typeof port === 'string') {
+		callback = data;
+		data = path;
+		path = port;
+		port = 5320;
+	}
+
+	httpPost(port, path, JSON.stringify(data), {'Content-Type': 'application/json'}, callback);
 };
 
 module.exports.post = httpPost;
