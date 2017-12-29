@@ -26,6 +26,7 @@
 
 var assert = require('perjury').assert,
     noopLog = require('./log'),
+    memoryPersistence = require('./persistence').memoryPersistence,
     _ = require('lodash');
 
 function configureAppSetup(config) {
@@ -33,7 +34,7 @@ function configureAppSetup(config) {
 		topic: function() {
 			var app = require('../../lib/app').makeApp(_.defaults(config, {
 				domains: []
-			}), noopLog, require('../../lib/persistence')('/tmp')),
+			}), noopLog, memoryPersistence()),
 			cb = this.callback;
 
 			var server = app.listen(config.port || 5320, config.address || 'localhost', function(err) {

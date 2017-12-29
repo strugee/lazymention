@@ -55,4 +55,22 @@ function wrapFsMocks(configurePath, obj) {
 	return _.assign({}, buildMockSetup(configurePath), obj);
 }
 
+function makeInMemoryPersistence() {
+	var store = new Map();
+
+	return function() {
+		return {
+			get: function(namespace, key, cb) {
+				process.nextTick(cb.bind(undefined, undefined, store.get(namespace + key) || {}));
+			},
+			set: function(namespace, key, data, cb) {
+				store.set(namespace + key, data);
+				process.nextTick(cb);
+
+			}
+		};
+	};
+}
+
 module.exports.wrapFsMocks = wrapFsMocks;
+module.exports.memoryPersistence = makeInMemoryPersistence;
