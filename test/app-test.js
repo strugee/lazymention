@@ -44,7 +44,10 @@ vows.describe('app module test').addBatch({
 		},
 		'and we call makeApp()': {
 			topic: function(app) {
-				return app.makeApp(noopLog, db(noopLog, '/tmp'));
+				return app.makeApp({}, noopLog, db('/tmp'));
+			},
+			'it works': function(err) {
+				assert.ifError(err);
 			},
 			'it returns an Express application': function(err, app) {
 				assert.isFunction(app);
@@ -53,7 +56,10 @@ vows.describe('app module test').addBatch({
 		},
 		'and we call makeRouter()': {
 			topic: function(app) {
-				return app.makeRouter(noopLog, db(noopLog, '/tmp'));
+				return app.makeRouter(db(noopLog, '/tmp'));
+			},
+			'it works': function(err) {
+				assert.ifError(err);
 			},
 			'it exports an Express Router': function(err, router) {
 				assert.isFunction(router);
