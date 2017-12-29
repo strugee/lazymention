@@ -101,7 +101,9 @@ You can get to the default implementation with `require('lazymention').persisten
 
 If you don't want to use the default implementation, you need to write a factory function. This function will be passed a single parameter, a child of the  Bunyan `Logger` object you passed. Keep in mind that it will be invoked with a different `Logger` for each request, so connecting out to a database or whatever each and every time this is invoked is probably a terrible idea.
 
-When invoked, your factory function should return an object with two keys, `get` and `set`. `set` must be a function that takes a key (string), an object to set as the value of that key, and a callback with signature `(err<Error>)`. `get` must be a function that takes a lookup key and a callback with signature `(err<Error>, data<Object>)`, `data` being the object that was set with `set`.
+When invoked, your factory function should return an object with two keys, `get` and `set`. `set` must be a function that takes a namespace (string), key (string), an object to set as the value of that key, and a callback with signature `(err<Error>)`. `get` must be a function that takes a namespace, a lookup key and a callback with signature `(err<Error>, data<Object>)`, `data` being the object that was set with `set`.
+
+Values are guaranteed to be JSON-serializable but otherwise there are no restrictions on what they can be.
 
 ## Author
 

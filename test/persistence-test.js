@@ -31,7 +31,7 @@ var vows = require('perjury'),
 
 var getNonexistantKey = {
 	topic: function(db) {
-		db.get('lolnope', this.callback);
+		db.get('TEST', 'lolnope', this.callback);
 	},
 	'it worked': function(err) {
 		assert.ifError(err);
@@ -44,7 +44,7 @@ var getNonexistantKey = {
 
 var getKey = {
 	topic: function(db) {
-		db.get('meaning_of_life', this.callback);
+		db.get('TEST', 'meaning_of_life', this.callback);
 	},
 	'it worked': function(err) {
 		assert.ifError(err);
@@ -87,19 +87,31 @@ vows.describe('persistence module').addBatch({
 					'and we set a key': {
 						topic: function(db) {
 							var cb = this.callback;
-							db.set('meaning_of_life', 42, function(err) {
+							db.set('TEST', 'meaning_of_life', 42, function(err) {
 								cb(err, db);
 							});
 						},
 						'it works': function(err) {
 							assert.ifError(err);
 						},
-						'and we get the key': getKey
+						'and we get the key': getKey,
+						'and we get the key from a different namespace': {
+							topic: function(db) {
+								db.get('TSET', 'meaning_of_life', this.callback);
+							},
+							'it worked': function(err) {
+								assert.ifError(err);
+							},
+							'it gave us an empty object': function(err, result) {
+								assert.isObject(result);
+								assert.isTrue(_.isEmpty(result));
+							}
+						}
 					},
 					'and we set a key with a slash': {
 						topic: function(db) {
 							var cb = this.callback;
-							db.set('lazymention/subkey', {foo: 'bar'}, function(err) {
+							db.set('TEST', 'lazymention/subkey', {foo: 'bar'}, function(err) {
 								cb(err, db);
 							});
 						},
@@ -108,7 +120,7 @@ vows.describe('persistence module').addBatch({
 						},
 						'and we get the key': {
 							topic: function(db) {
-								db.get('lazymention/subkey', this.callback);
+								db.get('TEST', 'lazymention/subkey', this.callback);
 							},
 							'it worked': function(err, obj) {
 								assert.ifError(err);
