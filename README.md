@@ -41,15 +41,15 @@ You should also set `NODE_ENV=production` in the environment, regardless of how 
 
 Here's what you can configure:
 
-| Name       | Description                                                  | Default   |
-| ---------- | ------------------------------------------------------------ | --------- |
-| `storage`  | Where to put data. Must be read/writable by the server user. | None      |
-| `port`     | Port for the HTTP server to bind to.                         | 8000      |
-| `address`  | Address for the HTTP server to bind to.                      | `0.0.0.0` |
-| `logger`   | Whether to have the logger write logs.                       | True      |
-| `logfile`  | Where to write logs to.                                      | stdout    |
-| `logLevel` | [Bunyan loglevel][] for the logger.                          | `info`    |
-| `domains`  | Whitelist of domains to allow in job submissions.            | None      |
+| Name       | Description                                                  | Type          | Default   |
+| ---------- | ------------------------------------------------------------ | ------------- | --------- |
+| `storage`  | Where to put data. Must be read/writable by the server user. | String        | None      |
+| `port`     | Port for the HTTP server to bind to.                         | Number        | 8000      |
+| `address`  | Address for the HTTP server to bind to.                      | String        | `0.0.0.0` |
+| `logger`   | Whether to have the logger write logs.                       | Boolean       | True      |
+| `logfile`  | Where to write logs to.                                      | String        | stdout    |
+| `logLevel` | [Bunyan loglevel][] for the logger.                          | String        | `info`  |
+| `domains`  | Whitelist of domains to allow in job submissions.            | Array<String> |None      |
 
 The `storage` and `domains` options are required. If you don't want to use a whitelist you can set `domains` to `[]`, but you're _strongly_ discouraged from doing so because of the security implications. In fact, the reason you have to set this manually is to make sure you know what you're doing.
 
