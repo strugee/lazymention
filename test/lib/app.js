@@ -28,27 +28,36 @@ var assert = require('perjury').assert,
     noopLog = require('./log'),
     _ = require('lodash');
 
-var appSetup = {
-	topic: function() {
-		var app = require('../../lib/app').makeApp(noopLog, require('../../lib/persistence')('/tmp')),
-		    cb = this.callback;
+function configureAppSetup(config) {
+	return {
+		topic: function() {
+			var app = require('../../lib/app').makeApp(_.defaults(config, {
+				domains: []
+			}), noopLog, require('../../lib/persistence')('/tmp')),
+			cb = this.callback;
 
-		var server = app.listen(5320, 'localhost', function(err) {
-			cb(err, server);
-		});
-	},
-	teardown: function(app) {
-		if (app && app.close) {
-			app.close(this.callback);
+			var server = app.listen(5320, 'localhost', function(err) {
+				cb(err, server);
+			});
+		},
+		teardown: function(app) {
+			if (app && app.close) {
+				app.close(this.callback);
+			}
+		},
+		'it works': function(err, app) {
+			assert.ifError(err);
 		}
-	},
-	'it works': function(err, app) {
-		assert.ifError(err);
-	}
+	};
 }
 
-function wrapAppSetup(obj) {
-	return _.assign({}, appSetup, obj);
+function wrapAppSetup(config, obj) {
+	if (!obj) {
+		obj = config;
+		config = {};
+	}
+
+	return _.assign({}, configureAppSetup(config), obj);
 }
 
 module.exports.wrapAppSetup = wrapAppSetup;

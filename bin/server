@@ -83,7 +83,7 @@ if (argv.logger === false) {
 
 var log = bunyan.createLogger(logParams),
     createDb = createDbFactory(argv.storage),
-    app = makeApp(log, createDb);
+    app = makeApp(argv, log, createDb);
 
 var server = app.listen(argv.port, argv.address, function() {
 	var host = server.address().address;
