@@ -55,7 +55,8 @@ var vows = require('perjury'),
     wrapFsMocks = persistenceutil.wrapFsMocks,
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
-	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!'
+	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!',
+	    noLinks: 'I have absolutely no links at all.'
     };
 
 var clock;
@@ -183,9 +184,29 @@ vows.describe('Webmention module').addBatch({
 									var spy = fns[0];
 									assert.equal(spy.callCount, 4);
 									// XXX args
+								},
+								'and we call the module with a post that has no links at all': {
+									topic: function(fns) {
+										var webmention = fns[1],
+										cb = this.callback;
+
+										webmention('http://ordinary.net/bland_post',
+										           200,
+										           data.noLinks,
+										           function(err) {
+											           cb(err, fns);
+										           });
+									},
+									'it works': function(err) {
+										assert.ifError(err);
+									},
+									'the spy wasn\'t called again': function(err, fns) {
+										var spy = fns[0];
+										assert.equal(spy.callCount, 4);
+										// XXX args
+									}
 								}
 							}
-
 						}
 					}
 				}
