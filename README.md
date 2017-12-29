@@ -61,6 +61,48 @@ If everything goes well, you'll get back 202 Accepted. If something went wrong, 
 
 In the future the reponse will contain a URL that lets you check the status of your job, but in the meantime all you get back is a lame 2xx status code.
 
+## Embedding
+
+lazymention has an embedding API, in case you want to reuse its functionality in another Node app. You can access both the overall Express application or just the job submission route.
+
+Note: your app would have to be AGPL 3.0 or later to comply with the licensing terms, but if this is a big problem I might consider relaxing the requirements so just ping me.
+
+### Express application
+
+Available as `require('lazymention').makeApp()`. You need to pass three arguments. In order:
+
+1. A configurations option that contains, at minimum, a `domain` key with the appropriate value
+2. A [Bunyan][] `Logger` object (or compatible)
+3. A persistence factory function (see below)
+
+Not providing these options as specified will raise `AssertionError`.
+
+The Express app is configured to parse JSON bodies and to compress response bodies. You can't disable the former because it's required for anything useful to happen and you can't disable the latter because that's a bad idea.
+
+`req.log` is configured to be a Bunyan child log and `req.config` is set to the app's config. The API is mounted at `/jobs/submit`, just like the standalone daemon.
+
+### Express `Router`
+
+Available as `require('lazymention').makeRouter()`. You need to pass a single argument, a persistence factory function (see below). Not providing this argument will raise `AssertionError`.
+
+The Router expects certain things:
+
+1. A `req.body` with something useful in it (how to populate this is up to you)
+2. A Bunyan `Logger` (or compatible) available as `req.log`
+3. A configuration object available as `req.config` and containing, at minimum, a `domains` key
+
+Everything else is up to you.
+
+### Persistence layer
+
+To work with the embedding API you are required to provide some layer for persistence. You can do whatever you want in this layer; the default implementation reads and writes flat files. You can either reuse the default or implement your own.
+
+You can get to the default implementation with `require('lazymention').persistence(<path>)`. Calling this will return a factory function configured with the filesystem `<path>` you provided.
+
+If you don't want to use the default implementation, you need to write a factory function. This function will be passed a single parameter, a child of the  Bunyan `Logger` object you passed. Keep in mind that it will be invoked with a different `Logger` for each request, so connecting out to a database or whatever each and every time this is invoked is probably a terrible idea.
+
+When invoked, your factory function should return an object with two keys, `get` and `set`. `set` must be a function that takes a key (string), an object to set as the value of that key, and a callback with signature `(err<Error>)`. `get` must be a function that takes a lookup key and a callback with signature `(err<Error>, data<Object>)`, `data` being the object that was set with `set`.
+
 ## Author
 
 AJ Jordan <alex@strugee.net>
@@ -72,3 +114,4 @@ AGPL 3.0 or later
  [IndieWeb]: https://indieweb.org/
  [Security Considerations section]: https://www.w3.org/TR/webmention/#security-considerations
  [Bunyan loglevel]: https://github.com/trentm/node-bunyan#levels
+ [Bunyan]: https://github.com/trentm/node-bunyan
