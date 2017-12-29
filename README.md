@@ -71,7 +71,7 @@ Note: your app would have to be AGPL 3.0 or later to comply with the licensing t
 
 Available as `require('lazymention').makeApp()`. You need to pass three arguments. In order:
 
-1. A configurations option that contains, at minimum, a `domain` key with the appropriate value
+1. A configurations object that contains, at minimum, a `domain` key with the appropriate value
 2. A [Bunyan][] `Logger` object (or compatible)
 3. A persistence factory function (see below)
 
