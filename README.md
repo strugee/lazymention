@@ -25,7 +25,7 @@ lazymention makes some maintainability tradeoffs that may result in denial-of-se
 
 Please be aware of these constraints before running lazymention in production.
 
-Also, it has no idea how to recurse into subpages of indexes. In the real world, I expect that this will not actually be a real problem.
+Also, lazymention has no idea how to recurse into subpages of indexes. In the real world, I expect that this will not actually be a real problem.
 
 ## Running
 
@@ -34,6 +34,8 @@ lazymention will install a command called, fittingly, `lazymention`. You need to
 You can provide configuration options in three ways: CLI flags, environment variables, and JSON configuration files - CLI flags override environment variables and environment variables override JSON configs. The default config file location is `/etc/lazymention.json`, but you can override this by passing `-c <path_to_config.json>`.
 
 If you configure with environment variables, just prefix the configuration values with `LAZYMENTION_`. CLI flags are just prefixed with `--`, as you'd expect - just run `lazymention --help` if this is confusing.
+
+You should also set `NODE_ENV=production` in the environment, regardless of how you're configuring lazymention.
 
 ### Configuration values
 
