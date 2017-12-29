@@ -56,6 +56,7 @@ var vows = require('perjury'),
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
 	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!',
+	    noHref: 'It\'s <a href="">yikes-worthy</a>!',
 	    noLinks: 'I have absolutely no links at all.'
     };
 
@@ -184,6 +185,27 @@ vows.describe('Webmention module').addBatch({
 									var spy = fns[0];
 									assert.equal(spy.callCount, 4);
 									// XXX args
+								},
+								'and we call the module with a post that has a blank <a href="">': {
+									topic: function(fns) {
+										var webmention = fns[1],
+										cb = this.callback;
+
+										webmention('http://malformed.technology/everything_is_terrible',
+										           200,
+										           data.noHref,
+										           function(err) {
+											           cb(err, fns);
+										           });
+									},
+									'it works': function(err) {
+										assert.ifError(err);
+									},
+									'the spy wasn\'t called again': function(err, fns) {
+										var spy = fns[0];
+										assert.equal(spy.callCount, 4);
+										// XXX args
+									}
 								},
 								'and we call the module with a post that has no links at all': {
 									topic: function(fns) {
