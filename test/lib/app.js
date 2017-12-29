@@ -36,7 +36,7 @@ function configureAppSetup(config) {
 			}), noopLog, require('../../lib/persistence')('/tmp')),
 			cb = this.callback;
 
-			var server = app.listen(5320, 'localhost', function(err) {
+			var server = app.listen(config.port || 5320, config.address || 'localhost', function(err) {
 				cb(err, server);
 			});
 		},
