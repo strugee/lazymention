@@ -42,6 +42,9 @@ vows.describe('app module test').addBatch({
 		'it exports an Express Router factory function': function(err, app) {
 			assert.isFunction(app.makeRouter);
 		},
+		'it exports the default persistence layer implementation': function(err, app) {
+			assert.isFunction(app.persistence);
+		},
 		'and we call makeApp()': {
 			topic: function(app) {
 				return app.makeApp({}, noopLog, db('/tmp'));
