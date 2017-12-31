@@ -61,6 +61,12 @@ If everything goes well, you'll get back 202 Accepted. If something went wrong, 
 
 In the future the reponse will contain a URL that lets you check the status of your job, but in the meantime all you get back is a lame 2xx status code.
 
+### API clients
+
+There's currently one API client, [`ping-lazymention`][]. It's nice for [gulp][] tasks.
+
+Have you written another client? Please send a Pull Request updating this section!
+
 ## Embedding
 
 lazymention has an embedding API, in case you want to reuse its functionality in another Node app. You can access both the overall Express application or just the job submission route.
@@ -118,4 +124,6 @@ AGPL 3.0 or later
  [IndieWeb]: https://indieweb.org/
  [Security Considerations section]: https://www.w3.org/TR/webmention/#security-considerations
  [Bunyan loglevel]: https://github.com/trentm/node-bunyan#levels
+ [`ping-lazymention`]: https://github.com/strugee/ping-lazymention/
+ [gulp]: https://gulpjs.com/
  [Bunyan]: https://github.com/trentm/node-bunyan
