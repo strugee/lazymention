@@ -1,0 +1,7 @@
+{
+    "domains": ["example.com"],
+    "storage": "/var/local/lazymention",
+    "port": 8000,
+    "address": "0.0.0.0",
+    "logfile": "/var/log/lazymention.json.log"
+}

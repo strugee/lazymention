@@ -31,7 +31,7 @@ Also, lazymention has no idea how to recurse into subpages of indexes. In the re
 
 lazymention will install a command called, fittingly, `lazymention`. You need to provide, at minimum, a storage location (you can do this on the CLI by passing `-s`), but not configuring anything else will give you a daemon running on port 8000, which is probably no good.
 
-You can provide configuration options in three ways: CLI flags, environment variables, and JSON configuration files - CLI flags override environment variables and environment variables override JSON configs. The default config file location is `/etc/lazymention.json`, but you can override this by passing `-c <path_to_config.json>`.
+You can provide configuration options in three ways: CLI flags, environment variables, and JSON configuration files - CLI flags override environment variables and environment variables override JSON configs. The default config file location is `/etc/lazymention.json`, but you can override this by passing `-c <path_to_config.json>`. There's a sample file called `lazymention.json.sample` but be sure to actually look at it; lazymention won't work for you if you don't adjust it a little bit.
 
 If you configure with environment variables, just prefix the configuration values with `LAZYMENTION_`. CLI flags are just prefixed with `--`, as you'd expect - just run `lazymention --help` if this is confusing. You can pass more than one value for `--domains` (e.g. `--domains example.com example.net`), as well as passing `--domains` more than once (e.g. `--domains example.com --domains example.net`). If you need to specify more than one domain via environment variables, separate them using `,`.
 
