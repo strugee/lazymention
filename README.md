@@ -13,7 +13,7 @@ Webmention functionality is currently done. WebSub is planned for the future.
 
 ## Installation
 
-    $ npm install -g lazymention
+    $ npm install -g --production lazymention
 
 ## Limitations
 
