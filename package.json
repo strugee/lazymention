@@ -1,6 +1,6 @@
 {
   "name": "lazymention",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Support WebSub and Webmention on a static site",
   "main": "lib/app.js",
   "bin": {
