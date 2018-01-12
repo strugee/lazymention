@@ -51,7 +51,7 @@ var vows = require('perjury'),
     sinon = require('sinon'),
     noopLog = require('./lib/log'),
     persistenceutil = require('./lib/persistence'),
-    db = require('../lib/persistence')('/tmp')(noopLog),
+    db = require('../dist/persistence')('/tmp')(noopLog),
     wrapFsMocks = persistenceutil.wrapFsMocks,
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
@@ -69,7 +69,7 @@ vows.describe('Webmention module').addBatch({
 			var spy = sinon.spy(function(source, destination, cb) {
 				cb(undefined, {success: true});
 			    }),
-			    module = proxyquire('../lib/webmention', {
+			    module = proxyquire('../dist/webmention', {
 				'send-webmention': spy
 			    });
 

@@ -58,7 +58,7 @@ var getKey = {
 vows.describe('persistence module').addBatch({
 	'When we require the module': {
 		topic: function() {
-			return require('../lib/persistence');
+			return require('../dist/persistence');
 		},
 		'it works': function(err) {
 			assert.ifError(err);
@@ -129,7 +129,7 @@ vows.describe('persistence module').addBatch({
 						},
 						'and we set up a new instance to bust the cache': {
 							topic: function() {
-								return require('../lib/persistence')('/tmp')(noopLog);
+								return require('../dist/persistence')('/tmp')(noopLog);
 							},
 							'it worked': function(err) {
 								assert.ifError(err);

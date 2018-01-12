@@ -46,7 +46,7 @@ vows.describe('h-entry canonicalization module').addBatch({
 		},
 		'and we require the module': {
 			topic: function() {
-				return require('../lib/hentries');
+				return require('../dist/hentries');
 			},
 			'it works': function(err) {
 				assert.ifError(err);

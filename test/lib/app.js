@@ -32,7 +32,7 @@ var assert = require('perjury').assert,
 function configureAppSetup(config) {
 	return {
 		topic: function() {
-			var app = require('../../lib/app').makeApp(_.defaults(config, {
+			var app = require('../../dist/app').makeApp(_.defaults(config, {
 				domains: []
 			}), noopLog, memoryPersistence()),
 			cb = this.callback;

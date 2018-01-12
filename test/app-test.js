@@ -26,12 +26,12 @@ var vows = require('perjury'),
     assert = vows.assert,
     express = require('express'),
     noopLog = require('./lib/log'),
-    db = require('../lib/persistence');
+    db = require('../dist/persistence');
 
 vows.describe('app module test').addBatch({
 	'When we get the app module': {
 		topic: function() {
-			return require('../lib/app');
+			return require('../dist/app');
 		},
 		'it works': function(err) {
 			assert.ifError(err);

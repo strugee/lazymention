@@ -61,7 +61,7 @@ vows.describe('HTTP retrieval module').addBatch({
 		},
 		'and we require the module': {
 			topic: function() {
-				return require('../lib/get');
+				return require('../dist/get');
 			},
 			'it works': function(err) {
 				assert.ifError(err);

@@ -24,8 +24,8 @@ License along with lazymention. If not, see
 
 'use strict';
 
-var makeApp = require('../lib/app.js').makeApp,
-    createDbFactory = require('../lib/persistence'),
+var makeApp = require('../dist/app.js').makeApp,
+    createDbFactory = require('../dist/persistence'),
     bunyan = require('bunyan');
 
 var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
