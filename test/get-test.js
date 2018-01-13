@@ -25,7 +25,8 @@ License along with lazymention. If not, see
 var vows = require('perjury'),
     assert = vows.assert,
     http = require('http'),
-    noopLog = require('./lib/log');
+    noopLog = require('./lib/log'),
+    pkg = require('../package.json');
 
 vows.describe('HTTP retrieval module').addBatch({
 	'When we set up a dummy HTTP server': {
@@ -142,7 +143,7 @@ vows.describe('HTTP retrieval module').addBatch({
 					},
 					'we sent the right User-Agent': function(err, data) {
 						assert.isTrue(data.includes('node.js/'));
-						assert.isTrue(data.includes('lazymention/1.0.0'));
+						assert.isTrue(data.includes('lazymention/' + pkg.version));
 					}
 				}
 			}
