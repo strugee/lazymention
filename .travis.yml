@@ -9,7 +9,7 @@ node_js:
 before_install:
   - npm install -g npm@5
   - npm install -g greenkeeper-lockfile@1
-before_script: greenkeeper-lockfile-update
+before_script: greenkeeper-lockfile-update && npm run prepare
 script: npm test && npm run test:install:local && npm run test:install:global
 # See greenkeeperio/greenkeeper-lockfile#87 for why we pipe to /dev/null
 after_script: "./node_modules/.bin/coveralls < coverage/lcov.info && greenkeeper-lockfile-upload > /dev/null"
