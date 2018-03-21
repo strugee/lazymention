@@ -52,7 +52,7 @@
     "mock-fs": "^4.4.2",
     "nyc": "^11.3.0",
     "perjury": "^1.1.0",
-    "proxyquire": "^1.8.0",
+    "proxyquire": "^2.0.1",
     "sinon": "^4.1.2",
     "typescript": "^2.6.2"
   }
