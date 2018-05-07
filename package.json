@@ -53,7 +53,7 @@
     "nyc": "^11.3.0",
     "perjury": "^1.1.0",
     "proxyquire": "^2.0.1",
-    "sinon": "^4.1.2",
+    "sinon": "^5.0.5",
     "typescript": "^2.6.2"
   }
 }
