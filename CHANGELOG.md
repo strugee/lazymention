@@ -14,6 +14,12 @@ Changes to everything else are not considered breaking. Notably, these are _not_
 
 If you think something that isn't in the first list should be covered, or aren't sure about something, please feel free to file an issue and I'll clarify the policy - this list could surely be more precise.
 
+## 2.0.0 - future
+
+### Breaking
+
+* Drop Node 4, 5, and 7 support
+
 ## 1.0.1 - 2018-12-06
 
 ### Changed
