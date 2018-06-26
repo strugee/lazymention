@@ -10,8 +10,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "test": "npm run build && nyc -r lcov -r text perjury test/*-test.js",
-    "test:install:global": "npm install -g . && type lazymention",
-    "test:install:local": "REPO=$(pwd); cd $(mktemp -d); npm install $REPO perjury@1 express@4 bunyan@1 && sed -e \"s;'\\.\\./lib/app';'lazymention';\" -e \"s;'\\.\\./lib/persistence');'lazymention').persistence;\" -e 's/app module test/local require() test/' -e \"s;'express';'lazymention/node_modules/express';\" $REPO/test/app-test.js > install-test.js && cp -r $REPO/test/lib . && perjury install-test.js",
+    "test:install": "npm install -g . && type lazymention",
     "watch": "tsc -w"
   },
   "repository": {
