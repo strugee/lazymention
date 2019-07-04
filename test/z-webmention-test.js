@@ -51,15 +51,14 @@ var vows = require('perjury'),
     sinon = require('sinon'),
     noopLog = require('./lib/log'),
     persistenceutil = require('./lib/persistence'),
-    db = require('../dist/persistence')('/tmp')(noopLog),
-    wrapFsMocks = persistenceutil.wrapFsMocks,
+    memoryPersistence = persistenceutil.memoryPersistence,
+    db = memoryPersistence()(),
     data = {
 	    singleLink: '<a href="http://nicenice.website/blag/new-puppy">So cute!</a>',
 	    multipleLinks: '<a href="http://magic.geek/pics/another-doggo">Even cuter!</a> I love <a href="http://catscatscats.org/">cats</a> too!',
 	    noHref: 'It\'s <a href="">yikes-worthy</a>!',
 	    noLinks: 'I have absolutely no links at all.'
     };
-
 var clock;
 
 vows.describe('Webmention module').addBatch({
@@ -96,13 +95,33 @@ vows.describe('Webmention module').addBatch({
 			'we get a function back': function(err, webmention) {
 				assert.isFunction(webmention[1]);
 			},
-			'and we set up persistence mocks': wrapFsMocks({
-				'and we call the module with a post': {
+			'and we call the module with a post': {
+				topic: function(fns) {
+					var webmention = fns[1],
+					cb = this.callback;
+
+					webmention('http://example.com/socute',
+					           100,
+					           data.singleLink,
+					           function(err) {
+						           cb(err, fns);
+					           });
+				},
+				'it works': function(err) {
+					assert.ifError(err);
+				},
+				'the spy was called': function(err, fns) {
+					var spy = fns[0];
+					assert.isTrue(spy.calledOnce);
+					// XXX assert arguments
+				},
+				'and we call it with the same data': {
 					topic: function(fns) {
 						var webmention = fns[1],
 						cb = this.callback;
 
 						webmention('http://example.com/socute',
+						           // Note: these are smaller because JS dates are in milliseconds but we're passing seconds
 						           100,
 						           data.singleLink,
 						           function(err) {
@@ -112,68 +131,67 @@ vows.describe('Webmention module').addBatch({
 					'it works': function(err) {
 						assert.ifError(err);
 					},
-					'the spy was called': function(err, fns) {
+					'the spy wasn\'t called again': function(err, fns) {
 						var spy = fns[0];
 						assert.isTrue(spy.calledOnce);
-						// XXX assert arguments
 					},
-					'and we call it with the same data': {
+					'and we call it with a newer timestamp': {
 						topic: function(fns) {
 							var webmention = fns[1],
-							cb = this.callback;
+							    cb = this.callback;
+
+							// This shouldn't matter, but just in case, we set the clock to be past the edited timestamp
+							clock.tick(100 * 1000);
 
 							webmention('http://example.com/socute',
-							           // Note: these are smaller because JS dates are in milliseconds but we're passing seconds
-							           100,
-							           data.singleLink,
-							           function(err) {
-								           cb(err, fns);
-							           });
+							    200,
+							    data.singleLink,
+							    function(err) {
+								    cb(err, fns);
+							    });
+						},
+						teardown: function() {
+							return clock.tick(-100 * 1000);
 						},
 						'it works': function(err) {
 							assert.ifError(err);
 						},
-						'the spy wasn\'t called again': function(err, fns) {
+						'the spy was called a second time': function(err, fns) {
 							var spy = fns[0];
-							assert.isTrue(spy.calledOnce);
+							assert.isTrue(spy.calledTwice);
+							// XXX assert arguments
 						},
-						'and we call it with a newer timestamp': {
+						// XXX find a way to not nest this so deeply - it
+						// has to be this way currently so the Sinon spy is
+						// called in the right order
+						'and we call it with a post with multiple links': {
 							topic: function(fns) {
 								var webmention = fns[1],
 								    cb = this.callback;
 
-								// This shouldn't matter, but just in case, we set the clock to be past the edited timestamp
-								clock.tick(100 * 1000);
-
-								webmention('http://example.com/socute',
+								webmention('http://example.com/morecuteness',
 								           200,
-								           data.singleLink,
+								           data.multipleLinks,
 								           function(err) {
 									           cb(err, fns);
 								           });
 							},
-							teardown: function() {
-								return clock.tick(-100 * 1000);
-							},
 							'it works': function(err) {
 								assert.ifError(err);
 							},
-							'the spy was called a second time': function(err, fns) {
+							'the spy was called two more times': function(err, fns) {
 								var spy = fns[0];
-								assert.isTrue(spy.calledTwice);
-								// XXX assert arguments
+								assert.equal(spy.callCount, 4);
+								// XXX args
 							},
-							// XXX find a way to not nest this so deeply - it
-							// has to be this way currently so the Sinon spy is
-							// called in the right order
-							'and we call it with a post with multiple links': {
+							'and we call the module with a post that has a blank <a href="">': {
 								topic: function(fns) {
 									var webmention = fns[1],
 									cb = this.callback;
 
-									webmention('http://example.com/morecuteness',
+									webmention('http://malformed.technology/everything_is_terrible',
 									           200,
-									           data.multipleLinks,
+									           data.noHref,
 									           function(err) {
 										           cb(err, fns);
 									           });
@@ -181,58 +199,37 @@ vows.describe('Webmention module').addBatch({
 								'it works': function(err) {
 									assert.ifError(err);
 								},
-								'the spy was called two more times': function(err, fns) {
+								'the spy wasn\'t called again': function(err, fns) {
 									var spy = fns[0];
 									assert.equal(spy.callCount, 4);
 									// XXX args
-								},
-								'and we call the module with a post that has a blank <a href="">': {
-									topic: function(fns) {
-										var webmention = fns[1],
-										cb = this.callback;
+								}
+							},
+							'and we call the module with a post that has no links at all': {
+								topic: function(fns) {
+									var webmention = fns[1],
+									cb = this.callback;
 
-										webmention('http://malformed.technology/everything_is_terrible',
-										           200,
-										           data.noHref,
-										           function(err) {
-											           cb(err, fns);
-										           });
-									},
-									'it works': function(err) {
-										assert.ifError(err);
-									},
-									'the spy wasn\'t called again': function(err, fns) {
-										var spy = fns[0];
-										assert.equal(spy.callCount, 4);
-										// XXX args
-									}
+									webmention('http://ordinary.net/bland_post',
+									           200,
+									           data.noLinks,
+									           function(err) {
+										           cb(err, fns);
+									           });
 								},
-								'and we call the module with a post that has no links at all': {
-									topic: function(fns) {
-										var webmention = fns[1],
-										cb = this.callback;
-
-										webmention('http://ordinary.net/bland_post',
-										           200,
-										           data.noLinks,
-										           function(err) {
-											           cb(err, fns);
-										           });
-									},
-									'it works': function(err) {
-										assert.ifError(err);
-									},
-									'the spy wasn\'t called again': function(err, fns) {
-										var spy = fns[0];
-										assert.equal(spy.callCount, 4);
-										// XXX args
-									}
+								'it works': function(err) {
+									assert.ifError(err);
+								},
+								'the spy wasn\'t called again': function(err, fns) {
+									var spy = fns[0];
+									assert.equal(spy.callCount, 4);
+									// XXX args
 								}
 							}
 						}
 					}
 				}
-			})
+			}
 		}
 	}
 }).export(module);
